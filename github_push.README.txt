@@ -1,0 +1,47 @@
+═══════════════════════════════════════════════════════════════
+  QUICK GITHUB PUSH — Developer Utility
+  Safe one-click upload helper
+  Does NOT affect website behavior
+═══════════════════════════════════════════════════════════════
+
+Usage: Choose your platform
+
+  Windows  →  double-click  push.bat
+  Mac/Linux →  terminal:    ./push.sh
+
+
+WHAT EACH COMMAND DOES
+
+  git add .
+    Stages every changed/new/deleted file in the repo.
+    The dot means "entire working directory."
+
+  git commit -m "update"
+    Saves the staged snapshot with a generic message.
+    Change "update" to something meaningful if you prefer.
+
+  git push
+    Uploads the committed snapshot to the remote (usually GitHub).
+
+
+SAFE USAGE
+
+  • These commands affect ONLY the Git history, never the live site.
+  • Run them anytime you want to back up your work to GitHub.
+  • The website will NOT reload, restart, or change behavior.
+  • If you're unsure, run  git status  first to see what will be pushed.
+
+
+WARNING — BRANCH NAMES
+
+  Do NOT change the branch name (main / master) in these scripts.
+  The branch is set by the remote repository.
+  Changing branches can cause push failures or detach HEAD.
+
+
+SHORTCUT FILES
+
+  push.bat   — Windows batch file (double-click to run)
+  push.sh    — Mac/Linux shell script (run with  ./push.sh)
+
+═══════════════════════════════════════════════════════════════
