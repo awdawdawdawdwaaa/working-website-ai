@@ -4,8 +4,10 @@ import useDeviceProfile from './useDeviceProfile'
 import MobileLoader from './MobileLoader'
 import loadMobileAssets from './MobileAssetLoader'
 import { progressToLabel, progressToPct } from './MobileLoadingState'
+import { getAssetEntries } from './AssetMap'
 
 const MobileScene = lazy(() => import('./MobileScene'))
+const FORCE_CONTINUE_MS = 30000
 
 function isLandscape() {
   if (window.screen?.orientation?.angle != null) {
@@ -36,6 +38,7 @@ export default function MobileEntry() {
   const [statusText, setStatusText] = useState('Preparing assets…')
   const loadingRef = useRef(false)
   const fullscreenDone = useRef(false)
+  const forcedRef = useRef(false)
 
   // ─── WARNING → ROTATE ──────────────────────────────────
   function handleWarningContinue() {
@@ -74,47 +77,73 @@ export default function MobileEntry() {
     if (loadingRef.current) return
     loadingRef.current = true
 
+    const forceTimer = setTimeout(() => {
+      if (forcedRef.current) return
+      forcedRef.current = true
+      setProgress(1)
+      setStatusText('Finalising…')
+      setTimeout(() => setSceneReady(true), 1000)
+    }, FORCE_CONTINUE_MS)
+
     async function run() {
       useGLTF.setDecoderPath('/draco/')
 
       setStatusText('Preparing assets…')
       setProgress(0.05)
 
-      await new Promise(r => setTimeout(r, 400))
+      await new Promise(r => setTimeout(r, 300))
 
       setStatusText('Loading models…')
+      setProgress(0.10)
+
+      const entries = getAssetEntries()
+
       try {
         await loadMobileAssets((val, path) => {
-          const raw = 0.05 + val * 0.65
+          const raw = 0.10 + val * 0.75
           setProgress(raw)
           setStatusText(progressToLabel(raw))
         })
       } catch {}
 
-      setProgress(0.70)
-      setStatusText('Loading environment…')
-      await new Promise(r => setTimeout(r, 300))
+      if (forcedRef.current) return
 
-      setProgress(0.80)
-      setStatusText('Optimising textures…')
-      await new Promise(r => setTimeout(r, 300))
+      clearTimeout(forceTimer)
+
+      const totalBytes = entries.reduce((s, [, mobilePath]) => {
+        try {
+          const size = Number(sessionStorage.getItem('mob_size_' + mobilePath)) || 0
+          return s + size
+        } catch { return s }
+      }, 0)
+
+      console.log(
+        `%c[Mobile] Props Loaded%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB compressed`,
+        'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
+      )
 
       setProgress(0.90)
-      setStatusText('Building scene…')
-      await new Promise(r => setTimeout(r, 400))
+      setStatusText('Finalising…')
+      await new Promise(r => setTimeout(r, 1000))
+
+      if (forcedRef.current) return
 
       setProgress(0.97)
-      setStatusText('Finalising…')
-      await new Promise(r => setTimeout(r, 500))
+
+      await new Promise(r => setTimeout(r, 800))
+
+      if (forcedRef.current) return
 
       setProgress(1)
-      setStatusText('Finalising…')
-      await new Promise(r => setTimeout(r, 200))
-
       setSceneReady(true)
     }
 
     run()
+
+    return () => {
+      clearTimeout(forceTimer)
+      forcedRef.current = true
+    }
   }, [phase])
 
   // ─── SCREEN ROUTING ────────────────────────────────────
@@ -130,7 +159,8 @@ export default function MobileEntry() {
     return <MobileLoader phase="fullscreen" onTap={handleTap} />
   }
 
-  if (phase === 'loading') {
+  // ← FIX: loading phase yields when sceneReady=true
+  if (phase === 'loading' && !sceneReady) {
     return (
       <MobileLoader
         phase="loading"

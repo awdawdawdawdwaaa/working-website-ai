@@ -1,11 +1,10 @@
 const STAGES = [
-  { id: 'fonts',     label: 'Preparing assets…',     weight: 0.05 },
-  { id: 'ui',        label: 'Loading UI…',            weight: 0.05 },
-  { id: 'props',     label: 'Loading models…',        weight: 0.50 },
+  { id: 'prep',       label: 'Preparing assets…',      weight: 0.10 },
+  { id: 'models',     label: 'Loading models…',        weight: 0.50 },
   { id: 'environment', label: 'Loading environment…',  weight: 0.15 },
-  { id: 'textures',  label: 'Optimising textures…',   weight: 0.10 },
-  { id: 'line',      label: 'Building scene…',        weight: 0.10 },
-  { id: 'scene',     label: 'Finalising…',            weight: 0.05 },
+  { id: 'textures',   label: 'Optimising textures…',   weight: 0.10 },
+  { id: 'line',       label: 'Building scene…',        weight: 0.10 },
+  { id: 'scene',      label: 'Finalising…',            weight: 0.05 },
 ]
 
 export function getStageForProgress(raw) {
@@ -24,8 +23,4 @@ export function progressToLabel(raw) {
 
 export function progressToPct(raw) {
   return Math.min(100, Math.max(0, Math.round(raw * 100)))
-}
-
-export function totalWeight() {
-  return STAGES.reduce((s, st) => s + st.weight, 0)
 }
