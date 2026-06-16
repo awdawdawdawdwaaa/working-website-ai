@@ -123,12 +123,22 @@ function FullscreenScreen({ onTap }) {
             <line x1="40" y1="11" x2="60" y2="11" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" opacity="0.25" />
           </svg>
           <div style={{
-            position: 'absolute', top: '52%', left: '50%',
+            position: 'absolute', top: '38%', left: '50%',
+            transform: 'translateX(-50%)',
+            animation: 'm-hand-tap 3.5s ease-in-out infinite',
+          }}>
+            <svg viewBox="0 0 24 32" width="20" height="28" fill="none">
+              <path d="M12 2 C8 4 5 8 5 14 C5 20 7 26 11 28 C12.5 29 13.5 29 15 28 C19 26 21 20 21 14 C21 8 18 4 14 2 C13 1.5 13 1.5 12 2Z"
+                fill="#f5efe4" opacity="0.85" />
+            </svg>
+          </div>
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
-            animation: 'm-tap-ripple 2.6s ease-out infinite',
+            animation: 'm-tap-ripple 3.5s ease-out infinite',
           }}>
             <div style={{
-              width: 20, height: 20,
+              width: 18, height: 18,
               border: '1.5px solid #e8c660',
               borderRadius: '50%',
               opacity: 0,

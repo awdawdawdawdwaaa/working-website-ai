@@ -379,12 +379,21 @@ body {
   100% { transform: rotate(-25deg) translateX(100%); }
 }
 
-/* ─── Mobile v0.5 — tap ripple ───────────────────────────── */
+/* ─── Mobile v0.5 — tap animations ────────────────────────── */
+@keyframes m-hand-tap {
+  0%, 100% { transform: translateY(-30px); }
+  25% { transform: translateY(-30px); }
+  45% { transform: translateY(2px); }
+  48% { transform: translateY(0px); }
+  52% { transform: translateY(-5px); }
+  65% { transform: translateY(-30px); }
+}
+
 @keyframes m-tap-ripple {
-  0%, 42% { transform: scale(0.2); opacity: 0.5; }
-  48% { transform: scale(0.6); opacity: 0.4; }
-  70% { transform: scale(2.5); opacity: 0; }
-  100% { transform: scale(2.5); opacity: 0; }
+  0%, 42% { transform: scale(0.15); opacity: 0.4; }
+  48% { transform: scale(0.5); opacity: 0.35; }
+  65% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
 }
 
 @keyframes m-rotate-arc {

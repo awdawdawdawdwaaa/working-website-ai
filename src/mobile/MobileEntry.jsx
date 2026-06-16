@@ -84,7 +84,7 @@ export default function MobileEntry() {
     function check() {
       if (isLandscape()) setPhase('fullscreen')
     }
-    let timer = setTimeout(check, 2500)
+    let timer = setTimeout(check, 6500)
     window.addEventListener('orientationchange', check)
     window.addEventListener('resize', check)
     check()
