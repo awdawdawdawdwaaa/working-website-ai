@@ -14,44 +14,32 @@ export default function MobileLoader({ phase, progress, statusText, onContinue, 
   return null
 }
 
-/* ─── SCREEN 1: WARNING — PC vs mobile ──────────────────── */
+/* ─── SCREEN 1: WARNING — desktop vs mobile ───────────── */
 function WarningScreen({ onContinue }) {
   return (
     <div style={s.root}>
-      <div className="m-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ width: 180, height: 130, position: 'relative', marginBottom: 32 }}>
-          <svg viewBox="0 0 180 130" width="180" height="130" fill="none">
-            <rect x="10" y="8" width="130" height="88" rx="4" stroke="#3a3428" strokeWidth="1.5" />
-            <rect x="14" y="12" width="122" height="72" rx="2" fill="#12100e" />
-            <rect x="14" y="12" width="122" height="72" rx="2" stroke="#1e1c18" strokeWidth="1" />
-            <rect x="55" y="96" width="40" height="4" rx="2" fill="#3a3428" />
-            <rect x="70" y="100" width="10" height="24" rx="1" fill="#2a2824" />
-            <line x1="30" y1="30" x2="120" y2="30" stroke="#1e1c18" strokeWidth="1" />
-            <line x1="30" y1="42" x2="100" y2="42" stroke="#1e1c18" strokeWidth="1" />
-            <line x1="30" y1="54" x2="110" y2="54" stroke="#1e1c18" strokeWidth="1" />
-            <rect x="60" y="24" width="28" height="12" rx="1" fill="#1a1814" stroke="#2a2824" strokeWidth="0.5" />
-            <rect x="30" y="60" width="90" height="18" rx="1" fill="#1a1814" stroke="#2a2824" strokeWidth="0.5" />
-            <rect x="120" y="16" width="8" height="4" rx="1" fill="#3a3428" />
-            <rect x="130" y="70" width="6" height="6" rx="1" fill="#3a3428" />
-            <rect x="130" y="80" width="6" height="6" rx="1" fill="#3a3428" />
-            <line x1="132" y1="38" x2="132" y2="62" stroke="#3a3428" strokeWidth="1" strokeDasharray="2 2" />
-            <rect x="131" y="36" width="4" height="4" rx="1" fill="#3a3428" />
-            <text x="155" y="52" fill="#3a3428" fontSize="7" fontFamily="monospace">WEB</text>
+      <div className="m-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 360, padding: '0 24px' }}>
+        <div style={{ width: 'clamp(100px, 30vw, 160px)', height: 'clamp(80px, 24vw, 120px)', marginBottom: 'clamp(20px, 4vh, 36px)' }}>
+          <svg viewBox="0 0 160 120" width="100%" height="100%" fill="none">
+            <rect x="8" y="6" width="110" height="78" rx="4" stroke="#e8c660" strokeWidth="1.2" opacity="0.5" />
+            <rect x="12" y="10" width="102" height="64" rx="2" fill="rgba(232,198,96,0.03)" />
+            <rect x="12" y="10" width="102" height="64" rx="2" stroke="#e8c660" strokeWidth="0.3" opacity="0.2" />
+            <rect x="46" y="84" width="34" height="4" rx="2" stroke="#e8c660" strokeWidth="0.6" opacity="0.3" />
+            <rect x="60" y="88" width="8" height="22" rx="1" stroke="#e8c660" strokeWidth="0.5" opacity="0.25" />
+            <line x1="24" y1="24" x2="102" y2="24" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <line x1="24" y1="34" x2="86" y2="34" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <line x1="24" y1="44" x2="94" y2="44" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <line x1="24" y1="54" x2="78" y2="54" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <rect x="116" y="42" width="36" height="8" rx="2" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <line x1="124" y1="46" x2="144" y2="46" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <line x1="124" y1="52" x2="138" y2="52" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <line x1="116" y1="36" x2="116" y2="42" stroke="#e8c660" strokeWidth="0.5" opacity="0.12" />
+            <line x1="152" y1="36" x2="152" y2="42" stroke="#e8c660" strokeWidth="0.5" opacity="0.12" />
+            <rect x="130" y="55" width="12" height="16" rx="6" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
+            <rect x="133" y="59" width="6" height="8" rx="1" fill="rgba(232,198,96,0.05)" />
           </svg>
-
-          <div style={{ position: 'absolute', bottom: 18, left: 138, width: 28, height: 44 }}>
-            <svg viewBox="0 0 28 44" width="28" height="44" fill="none">
-              <rect x="1" y="1" width="26" height="42" rx="6" stroke="#6a5e4a" strokeWidth="1" opacity="0.4" />
-              <rect x="5" y="7" width="18" height="24" rx="1" fill="#12100e" opacity="0.3" />
-              <circle cx="14" cy="36" r="2" stroke="#6a5e4a" strokeWidth="0.5" opacity="0.3" />
-              <line x1="12" y1="35" x2="12" y2="37" stroke="#6a5e4a" strokeWidth="0.5" opacity="0.3" />
-            </svg>
-          </div>
-
-          <line x1="130" y1="10" x2="140" y2="10" stroke="#6a5e4a" strokeWidth="0.5" opacity="0.3" strokeDasharray="2 2" />
-          <line x1="130" y1="14" x2="140" y2="14" stroke="#6a5e4a" strokeWidth="0.5" opacity="0.3" strokeDasharray="2 2" />
         </div>
-        <p style={s.warningText}>
+        <p style={{ ...s.warningText, color: '#f5efe4' }}>
           This website was made for PC.<br />Mobile may experience lag, bugs, or reduced asset quality.
         </p>
         <p style={s.footer}>TME — Ved (CEO)</p>
@@ -61,47 +49,40 @@ function WarningScreen({ onContinue }) {
   )
 }
 
-/* ─── SCREEN 2: ROTATE — phone in hand ──────────────────── */
+/* ─── SCREEN 2: ROTATE — minimal phone rotation ────────── */
 function RotateScreen() {
   return (
     <div style={s.root}>
-      <div className="m-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ width: 170, height: 200, position: 'relative', marginBottom: 36 }}>
+      <div className="m-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 360, padding: '0 24px' }}>
+        <div style={{ width: 'clamp(90px, 28vw, 150px)', height: 'clamp(130px, 38vw, 200px)', position: 'relative', marginBottom: 'clamp(20px, 4vh, 36px)' }}>
           <div style={{
             position: 'absolute', inset: 0,
-            animation: 'm-rotate-hand-phone 2.8s ease-in-out infinite',
+            animation: 'm-rotate-phone 2.4s ease-in-out infinite',
           }}>
-            <svg viewBox="0 0 170 200" width="170" height="200" fill="none">
-              <path d="M40 170 Q30 160 35 140 L35 60 Q35 40 50 35 L120 35 Q135 40 135 60 L135 140 Q135 160 125 170"
-                stroke="#3a3428" strokeWidth="2.5" fill="rgba(232,198,96,0.03)" />
-              <rect x="48" y="42" width="74" height="120" rx="8" stroke="#e8c660" strokeWidth="1.5" opacity="0.8" />
-              <rect x="56" y="58" width="58" height="80" rx="3" fill="rgba(232,198,96,0.04)" />
-              <circle cx="85" cy="150" r="4" stroke="#e8c660" strokeWidth="1" opacity="0.5" />
-              <line x1="72" y1="48" x2="98" y2="48" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+            <svg viewBox="0 0 100 150" width="100%" height="100%" fill="none">
+              <rect x="12" y="5" width="76" height="140" rx="12" stroke="#e8c660" strokeWidth="1.5" opacity="0.6" />
+              <rect x="20" y="24" width="60" height="96" rx="3" fill="rgba(232,198,96,0.02)" stroke="#e8c660" strokeWidth="0.3" opacity="0.2" />
+              <circle cx="50" cy="136" r="4" stroke="#e8c660" strokeWidth="0.8" opacity="0.3" />
+              <line x1="38" y1="14" x2="62" y2="14" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
+              <line x1="26" y1="32" x2="74" y2="32" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="44" x2="60" y2="44" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="56" x2="70" y2="56" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="68" x2="54" y2="68" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="80" x2="66" y2="80" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="92" x2="58" y2="92" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="104" x2="72" y2="104" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
+              <line x1="26" y1="112" x2="50" y2="112" stroke="#e8c660" strokeWidth="0.4" opacity="0.12" />
             </svg>
           </div>
-
           <div style={{
             position: 'absolute', inset: 0,
-            animation: 'm-rotate-arc 2.8s ease-in-out infinite',
-            transformOrigin: '85px 100px',
+            animation: 'm-rotate-arc 2.4s ease-in-out infinite',
+            transformOrigin: '50% 50%',
           }}>
-            <svg viewBox="0 0 170 200" width="170" height="200" fill="none">
-              <path d="M155 100 A70 70 0 0 1 20 130"
-                stroke="#e8c660" strokeWidth="1.5" fill="none" opacity="0.5" />
-              <polygon points="20,130 30,122 26,135" fill="#e8c660" opacity="0.6" />
-            </svg>
-          </div>
-
-          <div style={{
-            position: 'absolute', bottom: 20, right: 10, width: 28, height: 28,
-            animation: 'm-lock-pulse 2.8s ease-in-out infinite',
-          }}>
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
-              <rect x="5" y="10" width="14" height="12" rx="2" stroke="#e8c660" strokeWidth="1.2" opacity="0.7" />
-              <path d="M8 10 V7 C8 4 10 2 12 2 C14 2 16 4 16 7 V10"
-                stroke="#e8c660" strokeWidth="1.2" fill="none" opacity="0.7" />
-              <circle cx="12" cy="16" r="2" fill="#e8c660" opacity="0.5" />
+            <svg viewBox="0 0 100 150" width="100%" height="100%" fill="none">
+              <path d="M90 60 C95 70 96 85 90 95 C84 105 72 112 60 115"
+                stroke="#e8c660" strokeWidth="1.2" fill="none" opacity="0.4" />
+              <polygon points="60,115 68,108 66,120" fill="#e8c660" opacity="0.5" />
             </svg>
           </div>
         </div>
@@ -111,7 +92,7 @@ function RotateScreen() {
   )
 }
 
-/* ─── SCREEN 3: FULLSCREEN — phone with tap hand ──────────── */
+/* ─── SCREEN 3: FULLSCREEN — minimal tap to continue ──── */
 function FullscreenScreen({ onTap }) {
   function handle(e) {
     e?.preventDefault()
@@ -124,50 +105,37 @@ function FullscreenScreen({ onTap }) {
       onTouchStart={handle}
       style={{ ...s.root, cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation' }}
     >
-      <div className="m-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ width: 130, height: 190, position: 'relative', marginBottom: 32 }}>
-          <svg viewBox="0 0 130 190" width="130" height="190" fill="none">
-            <rect x="6" y="4" width="118" height="182" rx="16" stroke="#f5efe4" strokeWidth="1.5" opacity="0.3" />
-            <rect x="6" y="4" width="118" height="182" rx="16" fill="none" stroke="#e8c660" strokeWidth="0.5" opacity="0.15" />
-            <rect x="14" y="20" width="102" height="148" rx="4" fill="#0c0b0a" />
-            <rect x="14" y="20" width="102" height="148" rx="4" stroke="#1e1c18" strokeWidth="1" />
-            <line x1="26" y1="32" x2="104" y2="32" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="44" x2="90" y2="44" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="56" x2="96" y2="56" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="68" x2="86" y2="68" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="80" x2="100" y2="80" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="92" x2="74" y2="92" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="104" x2="104" y2="104" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="116" x2="92" y2="116" stroke="#1a1814" strokeWidth="0.8" />
-            <line x1="26" y1="128" x2="60" y2="128" stroke="#1a1814" strokeWidth="0.8" />
-            <rect x="42" y="134" width="46" height="28" rx="2" fill="#12100e" stroke="#1a1814" strokeWidth="0.5" />
-            <rect x="60" y="28" width="22" height="18" rx="2" fill="#1a1814" stroke="#2a2824" strokeWidth="0.5" />
-            <circle cx="65" cy="170" r="3" stroke="#3a3428" strokeWidth="0.8" />
-            <line x1="56" y1="10" x2="74" y2="10" stroke="#f5efe4" strokeWidth="2" strokeLinecap="round" opacity="0.15" />
+      <div className="m-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 360, padding: '0 24px' }}>
+        <div style={{ width: 'clamp(80px, 26vw, 130px)', height: 'clamp(120px, 36vw, 190px)', position: 'relative', marginBottom: 'clamp(16px, 3vh, 28px)' }}>
+          <svg viewBox="0 0 100 150" width="100%" height="100%" fill="none">
+            <rect x="8" y="3" width="84" height="144" rx="14" stroke="#e8c660" strokeWidth="1.2" opacity="0.5" />
+            <rect x="16" y="18" width="68" height="116" rx="3" fill="rgba(232,198,96,0.02)" stroke="#e8c660" strokeWidth="0.3" opacity="0.15" />
+            <line x1="24" y1="28" x2="76" y2="28" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="38" x2="66" y2="38" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="48" x2="72" y2="48" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="58" x2="60" y2="58" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="68" x2="74" y2="68" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="78" x2="56" y2="78" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="88" x2="70" y2="88" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="98" x2="62" y2="98" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="108" x2="68" y2="108" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <circle cx="50" cy="130" r="3" stroke="#e8c660" strokeWidth="0.6" opacity="0.25" />
+            <line x1="40" y1="11" x2="60" y2="11" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" opacity="0.25" />
           </svg>
-
           <div style={{
-            position: 'absolute', top: 72, left: 48,
-            animation: 'm-hand-tap 3s ease-in-out infinite',
+            position: 'absolute', top: '52%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            animation: 'm-tap-ripple 2.6s ease-out infinite',
           }}>
-            <svg viewBox="0 0 24 34" width="24" height="34" fill="none">
-              <path d="M12 4 C8 6 5 10 5 16 C5 22 7 28 11 30 C12.5 31 13.5 31 15 30 C19 28 21 22 21 16 C21 10 18 6 14 4 C13 3.5 13 3.5 12 4Z"
-                fill="#f5efe4" opacity="0.9" />
-              <path d="M12 4 C8 6 5 10 5 16 C5 22 7 28 11 30 C12.5 31 13.5 31 15 30 C19 28 21 22 21 16 C21 10 18 6 14 4 C13 3.5 13 3.5 12 4Z"
-                stroke="#e8c660" strokeWidth="0.5" opacity="0.3" />
-            </svg>
-          </div>
-
-          <div style={{
-            position: 'absolute', top: 92, left: 56,
-            animation: 'm-tap-ripple 3s ease-out infinite',
-          }}>
-            <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
-              <circle cx="8" cy="8" r="6" stroke="#e8c660" strokeWidth="1.2" />
-            </svg>
+            <div style={{
+              width: 20, height: 20,
+              border: '1.5px solid #e8c660',
+              borderRadius: '50%',
+              opacity: 0,
+            }} />
           </div>
         </div>
-        <p style={s.label}>Tap to Continue</p>
+        <p style={{ ...s.label, color: '#f5efe4' }}>Tap to Continue</p>
         <p style={s.sub}>Fullscreen mode will be enabled</p>
       </div>
     </div>
@@ -182,87 +150,103 @@ function SnakeLoadingScreen({ progress, statusText }) {
   return (
     <div style={s.root}>
       <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: '40px 48px', borderRadius: 16,
-        background: 'rgba(255,255,255,0.02)',
-        border: '1px solid rgba(232,198,96,0.08)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%',
+        maxWidth: 360, padding: '0 24px',
       }}>
-        <div style={{ width: 100, height: 100, position: 'relative', marginBottom: 32 }}>
-          <svg viewBox="0 0 100 100" width="100" height="100" className="m-snake-svg">
-            <path id="snake-path"
-              d="M 50 6 C 76 6, 94 24, 94 50 C 94 76, 76 94, 50 94 C 24 94, 6 76, 6 50 C 6 24, 24 6, 50 6"
-              fill="none" stroke="#e8c660" strokeWidth="2.5"
-              strokeLinecap="round" strokeLinejoin="round"
-              className="m-snake-stroke"
-            />
-          </svg>
-        </div>
         <div style={{
-          width: 200, height: 2, background: 'rgba(232,198,96,0.08)', borderRadius: 2, overflow: 'hidden',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: 'clamp(24px, 5vw, 36px) clamp(32px, 8vw, 48px)',
+          borderRadius: 16, width: '100%', maxWidth: 280,
+          border: '1px solid rgba(232,198,96,0.1)',
         }}>
+          <div style={{ width: 'clamp(60px, 20vw, 90px)', height: 'clamp(60px, 20vw, 90px)', position: 'relative', marginBottom: 'clamp(20px, 3vh, 28px)' }}>
+            <svg viewBox="0 0 100 100" width="100%" height="100%" className="m-snake-svg">
+              <path id="snake-path"
+                d="M 50 6 C 76 6, 94 24, 94 50 C 94 76, 76 94, 50 94 C 24 94, 6 76, 6 50 C 6 24, 24 6, 50 6"
+                fill="none" stroke="#e8c660" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round"
+                className="m-snake-stroke"
+              />
+            </svg>
+          </div>
           <div style={{
-            height: '100%', background: '#e8c660', borderRadius: 2,
-            width: `${pct}%`,
-            transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-          }} />
+            width: '100%', maxWidth: 180, height: 2,
+            borderRadius: 2, overflow: 'hidden',
+          }}>
+            <div style={{
+              height: '100%', background: '#e8c660', borderRadius: 2,
+              width: `${pct}%`,
+              transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+            }} />
+          </div>
+          <p style={s.statusText}>{label}</p>
         </div>
-        <p style={s.statusText}>{label}</p>
       </div>
     </div>
   )
 }
 
 /* ─── Styles ──────────────────────────────────────────── */
+const YELLOW = '#e8c660'
+const WHITE = '#f5efe4'
+
 const s = {
   root: {
     position: 'fixed', inset: 0, zIndex: 999999,
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
     background: '#080808',
+    height: '100dvh',
   },
   label: {
     fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-    fontSize: 'clamp(0.85rem, 3vw, 1rem)',
-    color: '#f5efe4', letterSpacing: '0.12em',
+    fontSize: 'clamp(0.75rem, 2.8vw, 1rem)',
+    color: WHITE, letterSpacing: '0.12em',
     textTransform: 'uppercase', margin: 0,
+    textAlign: 'center',
   },
   sub: {
     fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-    fontSize: 'clamp(0.65rem, 2.2vw, 0.75rem)',
-    color: '#6a5e4a', letterSpacing: '0.04em',
-    marginTop: 12, textAlign: 'center', maxWidth: 280,
+    fontSize: 'clamp(0.55rem, 2vw, 0.75rem)',
+    color: YELLOW, letterSpacing: '0.06em',
+    marginTop: 'clamp(8px, 1.5vh, 14px)',
+    textAlign: 'center', maxWidth: 280,
+    opacity: 0.7,
   },
   warningText: {
     fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-    fontSize: 'clamp(0.8rem, 2.8vw, 0.95rem)',
+    fontSize: 'clamp(0.7rem, 2.6vw, 0.9rem)',
     color: '#c8bfae', lineHeight: 1.7, margin: 0,
     textAlign: 'center', maxWidth: 320,
   },
   footer: {
     fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-    fontSize: '0.65rem', color: '#3a3428',
-    letterSpacing: '0.08em', textAlign: 'center',
-    marginTop: 32, marginBottom: 24,
+    fontSize: '0.6rem',
+    color: YELLOW, letterSpacing: '0.08em',
+    textAlign: 'center',
+    marginTop: 'clamp(20px, 4vh, 32px)',
+    marginBottom: 'clamp(16px, 3vh, 24px)',
+    opacity: 0.5,
   },
   btn: {
     display: 'block', margin: '0 auto',
     background: 'transparent',
-    border: '1px solid #e8c660',
+    border: `1px solid ${YELLOW}`,
     borderRadius: 4,
-    color: '#f5efe4',
+    color: WHITE,
     fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-    fontSize: '0.8rem',
-    padding: '10px 28px',
+    fontSize: 'clamp(0.7rem, 2.4vw, 0.8rem)',
+    padding: 'clamp(8px, 1.5vh, 12px) clamp(20px, 5vw, 32px)',
     cursor: 'pointer',
     letterSpacing: '0.06em',
   },
   statusText: {
     fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-    fontSize: 'clamp(0.7rem, 2.4vw, 0.8rem)',
-    color: '#8a7d6a',
-    letterSpacing: '0.05em',
-    marginTop: 20,
+    fontSize: 'clamp(0.6rem, 2.2vw, 0.75rem)',
+    color: YELLOW, letterSpacing: '0.05em',
+    marginTop: 'clamp(12px, 2vh, 20px)',
     textAlign: 'center',
-    minHeight: '1.4em',
+    minHeight: '1.2em',
+    opacity: 0.6,
   },
 }
