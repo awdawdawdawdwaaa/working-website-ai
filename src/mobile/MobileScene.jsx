@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import ScrollCinematicFlow from '../scenes/ScrollCinematicFlow'
 import IntroOverlay from '../ui/IntroOverlay'
@@ -12,6 +12,7 @@ import { MemoizedOverlay, MemoizedTextSystem } from './MobileMemoUI'
 import useForwardOnlyScroll from './useForwardOnlyScroll'
 import ForwardOnlyOverlay from './ForwardOnlyOverlay'
 import WarmupPhase from './WarmupPhase'
+import FrameScheduler from './FrameScheduler'
 
 applyMobileQuality()
 
@@ -23,6 +24,17 @@ export default function MobileScene({ prewarm, onRestart }) {
   const prevRawRef = useRef(rawProgress)
   const slowRef = useRef(rawProgress)
   const idleFrames = useRef(0)
+
+  const [isScrolling, setIsScrolling] = useState(false)
+  const scrollTimer = useRef(null)
+
+  useEffect(() => {
+    setIsScrolling(true)
+    if (scrollTimer.current) clearTimeout(scrollTimer.current)
+    scrollTimer.current = setTimeout(() => {
+      setIsScrolling(false)
+    }, 500)
+  }, [rawProgress])
 
   const { blocked, effectiveProgress, reset } = useForwardOnlyScroll(rawProgress)
 
@@ -43,7 +55,6 @@ export default function MobileScene({ prewarm, onRestart }) {
     slowRef.current = Math.max(slowRef.current, baseProgress)
   }
 
-  // ── deadzone: stop drift when user stops scrolling ──
   const drift = Math.abs(baseProgress - slowRef.current)
   if (Math.abs(limitedDelta) < DRIFT_DEADZONE) {
     idleFrames.current++
@@ -56,20 +67,9 @@ export default function MobileScene({ prewarm, onRestart }) {
     slowRef.current = baseProgress
   }
 
-  // ── scroll velocity log (every 5 frames) ──
-  const logCounter = useRef(0)
-  logCounter.current++
-  if (logCounter.current % 5 === 0 && Math.abs(limitedDelta) > 0.001) {
-    console.log(
-      `%c[Scroll] Velocity: ${(limitedDelta * 1000).toFixed(2)}e-3 | Target: ${(rawTarget * 100).toFixed(1)}% | Actual: ${(baseProgress * 100).toFixed(1)}% | FrameGap: ${(drift * 100).toFixed(2)}%`,
-      'color:#6a5e4a'
-    )
-  }
-
   const progress = Math.max(0, Math.min(1, slowRef.current))
 
   const handleStartAgain = useCallback(() => {
-    console.log('%c[Restart] Returning to first screen', 'color:#e8c660')
     reset()
     onRestart?.()
   }, [reset, onRestart])
@@ -86,6 +86,7 @@ export default function MobileScene({ prewarm, onRestart }) {
         <main className="cinematic-shell">
           <div className="canvas-stage">
             <Canvas
+              frameloop="demand"
               dpr={MOBILE_RENDERER.dpr}
               shadows={MOBILE_RENDERER.shadows}
               camera={MOBILE_RENDERER.camera}
@@ -95,6 +96,7 @@ export default function MobileScene({ prewarm, onRestart }) {
                 applyRendererProfile(state.gl)
               }}
             >
+              <FrameScheduler active={isScrolling} />
               <WarmupPhase />
               <AdaptiveQuality />
               <ScrollCinematicFlow progress={progress} />

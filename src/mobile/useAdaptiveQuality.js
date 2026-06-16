@@ -1,12 +1,12 @@
 import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 
-const RING_SIZE = 30
-const CHECK_INTERVAL = 30
-const LOW_THRESHOLD = 15
-const RESTORE_THRESHOLD = 45
-const LOW_CONSECUTIVE = 5
-const GOOD_CONSECUTIVE = 15
+const RING_SIZE = 20
+const CHECK_INTERVAL = 15
+const LOW_THRESHOLD = 20
+const RESTORE_THRESHOLD = 40
+const LOW_CONSECUTIVE = 3
+const GOOD_CONSECUTIVE = 20
 
 export default function AdaptiveQuality() {
   const { gl } = useThree()
@@ -55,8 +55,8 @@ export default function AdaptiveQuality() {
     }
 
     if (lowCount.current > LOW_CONSECUTIVE && level.current > 0.5) {
-      level.current = Math.max(0.5, +(level.current - 0.1).toFixed(2))
-      gl.setPixelRatio(Math.max(0.5, Math.min(1.25, level.current)))
+      level.current = Math.max(0.5, +(level.current - 0.15).toFixed(2))
+      gl.setPixelRatio(Math.max(0.5, Math.min(1.0, level.current)))
       lowCount.current = 0
       if (typeof window !== 'undefined') {
         window.__MOBILE_QUALITY_LEVEL = level.current
@@ -64,8 +64,8 @@ export default function AdaptiveQuality() {
     }
 
     if (goodCount.current > GOOD_CONSECUTIVE && level.current < 1) {
-      level.current = Math.min(1, +(level.current + 0.1).toFixed(2))
-      gl.setPixelRatio(Math.max(0.5, Math.min(1.25, level.current)))
+      level.current = Math.min(1.0, +(level.current + 0.05).toFixed(2))
+      gl.setPixelRatio(Math.max(0.5, Math.min(1.0, level.current)))
       goodCount.current = 0
       if (typeof window !== 'undefined') {
         window.__MOBILE_QUALITY_LEVEL = level.current
