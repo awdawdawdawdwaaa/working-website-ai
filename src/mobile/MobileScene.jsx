@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import ScrollCinematicFlow from '../scenes/ScrollCinematicFlow'
@@ -10,7 +10,6 @@ import { getSlowFactor } from '../core/narrativeRegistry'
 import useScrollLimiter from './useScrollLimiter'
 import applyMobileQuality from './MobileQualityProfile'
 import AdaptiveQuality from './useAdaptiveQuality'
-import CameraSmoother, { cameraProgressRef } from './CameraSmoother'
 import useForwardOnlyScroll from './useForwardOnlyScroll'
 import ForwardOnlyOverlay from './ForwardOnlyOverlay'
 
@@ -22,7 +21,6 @@ export default function MobileScene({ prewarm, onRestart }) {
   const slowRef = useRef(rawProgress)
 
   const { blocked, effectiveProgress, reset } = useForwardOnlyScroll(rawProgress)
-  const progressRef = useRef(rawProgress)
 
   const rawDelta = rawProgress - prevRawRef.current
   prevRawRef.current = rawProgress
@@ -30,8 +28,6 @@ export default function MobileScene({ prewarm, onRestart }) {
   const limitedDelta = useScrollLimiter(rawDelta)
 
   const baseProgress = blocked ? effectiveProgress : rawProgress
-  progressRef.current = baseProgress
-  cameraProgressRef.current = baseProgress
 
   if (limitedDelta > 0) {
     const sf = getSlowFactor()
@@ -77,7 +73,6 @@ export default function MobileScene({ prewarm, onRestart }) {
               }}
             >
               <AdaptiveQuality />
-              <CameraSmoother />
               <ScrollCinematicFlow progress={progress} />
             </Canvas>
           </div>

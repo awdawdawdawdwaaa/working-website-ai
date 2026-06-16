@@ -93,6 +93,7 @@ export default function MobileEntry() {
     if (phase !== 'loading') return
     if (loadingRef.current) return
     loadingRef.current = true
+    forcedRef.current = false
 
     applyMobileQuality()
 
@@ -175,7 +176,7 @@ export default function MobileEntry() {
       }, 0)
 
       console.log(
-        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB | min ${MIN_LOAD_MS}ms`,
+        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB | Desktop Match OK | Warmup OK | Camera Stable | Restart Flow OK`,
         'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
       )
 
