@@ -3,6 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import useDeviceProfile from './useDeviceProfile'
 import MobileLoader from './MobileLoader'
 import loadMobileAssets from './MobileAssetLoader'
+import { progressToLabel, progressToPct } from './MobileLoadingState'
 
 const MobileScene = lazy(() => import('./MobileScene'))
 
@@ -19,29 +20,35 @@ function isLandscape() {
 }
 
 const PROP_NAMES = {
-  'Meshy_AI_Age_Wall_0611070403_texture.glb': 'Age Wall',
-  'Meshy_AI_Brushed_Steel_City_Sk_0610152611_texture.glb': 'Steel City',
-  'Meshy_AI_Ahmedabad_Map_Install_0611072026_texture.glb': 'Map Install',
-  'Meshy_AI_Time_in_Steel_0611065420_texture.glb': 'Time in Steel',
-  'Meshy_AI_Python_Development_Ex_0611071109_texture.glb': 'Python Dev',
+  'Meshy_AI_Age_Wall_0611070403_texture.glb': 'Models',
+  'Meshy_AI_Brushed_Steel_City_Sk_0610152611_texture.glb': 'Models',
+  'Meshy_AI_Ahmedabad_Map_Install_0611072026_texture.glb': 'Models',
+  'Meshy_AI_Time_in_Steel_0611065420_texture.glb': 'Models',
+  'Meshy_AI_Python_Development_Ex_0611071109_texture.glb': 'Models',
   'character.glb': 'Character',
 }
 
 export default function MobileEntry() {
-  const { isMobile } = useDeviceProfile()
+  useDeviceProfile()
   const [sceneReady, setSceneReady] = useState(false)
-  const [loaderPhase, setLoaderPhase] = useState('rotate')
+  const [phase, setPhase] = useState('warning')
   const [progress, setProgress] = useState(0)
-  const [assetHint, setAssetHint] = useState('')
+  const [statusText, setStatusText] = useState('Preparing assets…')
   const loadingRef = useRef(false)
+  const fullscreenDone = useRef(false)
+
+  // ─── WARNING → ROTATE ──────────────────────────────────
+  function handleWarningContinue() {
+    setPhase('rotate')
+  }
 
   // ─── ROTATE → detect landscape ─────────────────────────
   useEffect(() => {
-    if (loaderPhase !== 'rotate') return
+    if (phase !== 'rotate') return
     function check() {
-      if (isLandscape()) setLoaderPhase('loading')
+      if (isLandscape()) setPhase('fullscreen')
     }
-    let timer = setTimeout(check, 3000)
+    let timer = setTimeout(check, 2500)
     window.addEventListener('orientationchange', check)
     window.addEventListener('resize', check)
     check()
@@ -50,51 +57,85 @@ export default function MobileEntry() {
       window.removeEventListener('orientationchange', check)
       window.removeEventListener('resize', check)
     }
-  }, [loaderPhase])
+  }, [phase])
+
+  // ─── FULLSCREEN TAP ────────────────────────────────────
+  function handleTap() {
+    if (fullscreenDone.current) return
+    fullscreenDone.current = true
+    try { document.documentElement.requestFullscreen?.() } catch {}
+    try { navigator.wakeLock?.request('screen')?.catch(() => {}) } catch {}
+    setPhase('loading')
+  }
 
   // ─── LOADING ───────────────────────────────────────────
   useEffect(() => {
-    if (loaderPhase !== 'loading') return
+    if (phase !== 'loading') return
     if (loadingRef.current) return
     loadingRef.current = true
 
     async function run() {
       useGLTF.setDecoderPath('/draco/')
+
+      setStatusText('Preparing assets…')
+      setProgress(0.05)
+
+      await new Promise(r => setTimeout(r, 400))
+
+      setStatusText('Loading models…')
       try {
         await loadMobileAssets((val, path) => {
-          const name = path?.split('/').pop() ?? ''
-          setAssetHint(PROP_NAMES[name] || name.replace(/\.glb$/, ''))
-          setProgress(val)
+          const raw = 0.05 + val * 0.65
+          setProgress(raw)
+          setStatusText(progressToLabel(raw))
         })
       } catch {}
-      setLoaderPhase('tap')
+
+      setProgress(0.70)
+      setStatusText('Loading environment…')
+      await new Promise(r => setTimeout(r, 300))
+
+      setProgress(0.80)
+      setStatusText('Optimising textures…')
+      await new Promise(r => setTimeout(r, 300))
+
+      setProgress(0.90)
+      setStatusText('Building scene…')
+      await new Promise(r => setTimeout(r, 400))
+
+      setProgress(0.97)
+      setStatusText('Finalising…')
+      await new Promise(r => setTimeout(r, 500))
+
+      setProgress(1)
+      setStatusText('Finalising…')
+      await new Promise(r => setTimeout(r, 200))
+
+      setSceneReady(true)
     }
+
     run()
-  }, [loaderPhase])
+  }, [phase])
 
   // ─── SCREEN ROUTING ────────────────────────────────────
-  if (loaderPhase === 'rotate' || loaderPhase === 'loading') {
-    return <MobileLoader phase={loaderPhase} progress={progress} assetHint={assetHint} />
+  if (phase === 'warning') {
+    return <MobileLoader phase="warning" onContinue={handleWarningContinue} />
   }
 
-  if (loaderPhase === 'tap') {
-    return (
-      <MobileLoader
-        phase="tap"
-        onTapContinue={() => {
-          try { document.documentElement.requestFullscreen?.() } catch {}
-          try { navigator.wakeLock?.request('screen') } catch {}
-          setLoaderPhase('warning')
-        }}
-      />
-    )
+  if (phase === 'rotate') {
+    return <MobileLoader phase="rotate" />
   }
 
-  if (loaderPhase === 'warning') {
+  if (phase === 'fullscreen') {
+    return <MobileLoader phase="fullscreen" onTap={handleTap} />
+  }
+
+  if (phase === 'loading') {
     return (
       <MobileLoader
-        phase="warning"
-        onWarningContinue={() => setSceneReady(true)}
+        phase="loading"
+        progress={progress}
+        statusText={statusText}
       />
     )
   }

@@ -1,142 +1,144 @@
-export default function MobileLoader({ phase, progress, assetHint, onTapContinue, onWarningContinue }) {
+export default function MobileLoader({ phase, progress, statusText, onContinue, onTap }) {
 
-  // ─── ROTATE PHONE ─────────────────────────────────────────
+  if (phase === 'warning') {
+    return <WarningScreen onContinue={onContinue} />
+  }
+
   if (phase === 'rotate') {
     return <RotateScreen />
   }
 
-  // ─── LOADING ──────────────────────────────────────────────
+  if (phase === 'fullscreen') {
+    return <FullscreenScreen onTap={onTap} />
+  }
+
   if (phase === 'loading') {
-    return <LoadingScreen progress={progress} assetHint={assetHint} />
-  }
-
-  // ─── TAP TO CONTINUE ──────────────────────────────────────
-  if (phase === 'tap') {
-    return <TapScreen onTap={onTapContinue} />
-  }
-
-  // ─── WARNING ──────────────────────────────────────────────
-  if (phase === 'warning') {
-    return <WarningScreen onContinue={onWarningContinue} />
+    return <SnakeLoadingScreen progress={progress} statusText={statusText} />
   }
 
   return null
 }
 
-/* ─── ROTATE PHONE ─────────────────────────────────────── */
-function RotateScreen() {
-  return (
-    <div style={s.root}>
-      <div style={{ width: 140, height: 200, position: 'relative', marginBottom: 40 }}>
-        <svg viewBox="0 0 140 200" width="140" height="200"
-          style={{ animation: 'm-rotate-phone 2.4s ease-in-out infinite' }}>
-          <rect x="10" y="5" width="120" height="190" rx="18" stroke="#e8c660" strokeWidth="2.5" fill="none" />
-          <rect x="25" y="28" width="90" height="130" rx="4" fill="rgba(232,198,96,0.06)" />
-          <line x1="42" y1="16" x2="98" y2="16" stroke="#e8c660" strokeWidth="3" strokeLinecap="round" />
-          <circle cx="70" cy="175" r="8" stroke="#e8c660" strokeWidth="2" fill="none" />
-        </svg>
-        <svg viewBox="0 0 140 200" width="140" height="200"
-          style={{ position: 'absolute', inset: 0, animation: 'm-rotate-arrow 2.4s ease-in-out infinite' }}>
-          <path d="M130 60 A80 80 0 0 1 70 170" stroke="#e8c660" strokeWidth="2" fill="none" strokeDasharray="6 4" />
-          <polygon points="70,170 76,158 64,158" fill="#e8c660" />
-        </svg>
-      </div>
-      <p style={s.label}>Rotate Device</p>
-      <p style={s.sub}>Please rotate your phone to landscape</p>
-    </div>
-  )
-}
-
-/* ─── LOADING ──────────────────────────────────────────── */
-function LoadingScreen({ progress, assetHint }) {
-  const pct = Math.min(100, Math.max(0, Math.round((progress ?? 0) * 100)))
-  const msg = assetHint ? `Loading Assets — ${assetHint}` : 'Loading Assets'
-
-  return (
-    <div style={s.root}>
-      <svg className="m-loader-spinner" viewBox="0 0 48 48" width="56" height="56">
-        <circle cx="24" cy="24" r="20" fill="none" stroke="#1e1c18" strokeWidth="3" />
-        <circle cx="24" cy="24" r="20" fill="none" stroke="#e8c660" strokeWidth="3"
-          strokeDasharray={`${2 * Math.PI * 20}`}
-          strokeDashoffset={`${2 * Math.PI * 20 * (1 - (progress ?? 0))}`}
-          strokeLinecap="round" transform="rotate(-90 24 24)"
-          style={{ transition: 'stroke-dashoffset 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}
-        />
-      </svg>
-      <p style={{ ...s.label, marginTop: 28 }}>{msg}</p>
-      <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0,
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '20px 24px',
-      }}>
-        <div style={{ flex: 1, height: 2, background: '#1e1c18', borderRadius: 2, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', background: '#e8c660', borderRadius: 2,
-            width: `${pct}%`,
-            transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-          }} />
-        </div>
-        <span style={{
-          fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-          fontSize: '0.7rem', color: '#5a4e3a',
-          minWidth: '2.4em', textAlign: 'right',
-          fontVariantNumeric: 'tabular-nums',
-        }}>{pct}%</span>
-      </div>
-    </div>
-  )
-}
-
-/* ─── TAP TO CONTINUE ──────────────────────────────────── */
-function TapScreen({ onTap }) {
-  function handle() { onTap() }
-
-  return (
-    <div onClick={handle} onTouchStart={handle} style={{ ...s.root, cursor: 'pointer',
-      userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation',
-    }}>
-      <div style={{ width: 80, height: 100, position: 'relative', marginBottom: 28 }}>
-        <svg viewBox="0 0 60 80" width="80" height="100"
-          style={{ animation: 'm-tap-hand 1.8s ease-in-out infinite' }}>
-          <path d="M30 50 V22 C30 19 28 17 26 17 C24 17 22 19 22 22 L22 43 L16 38 C13 36 10 35 8 37 C6 39 5 42 7 45 L17 56 C20 60 24 63 30 63 H38 C46 63 52 57 52 49 V28 C52 25 50 23 48 23 C46 23 44 25 44 28 V38"
-            stroke="#e8c660" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <path d="M30 50 V14 C30 12 28 10 26 10 C24 10 22 12 22 14 V22"
-            stroke="#e8c660" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <circle cx="26" cy="8" r="4" fill="#e8c660" opacity="0.5">
-            <animate attributeName="r" values="4;8;4" dur="1.8s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.5;0;0.5" dur="1.8s" repeatCount="indefinite" />
-          </circle>
-        </svg>
-      </div>
-      <p style={s.label}>Tap to Continue</p>
-      <p style={s.sub}>Fullscreen mode will be enabled</p>
-    </div>
-  )
-}
-
-/* ─── WARNING ──────────────────────────────────────────── */
+/* ─── SCREEN 1: WARNING ───────────────────────────────── */
 function WarningScreen({ onContinue }) {
   return (
     <div style={s.root}>
-      <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="#e8c660" strokeWidth="1.5" style={{ marginBottom: 20 }}>
-        <circle cx="16" cy="16" r="12" />
-        <path d="M12 20 L20 12 M12 12 L20 20" />
-      </svg>
-      <p style={{
-        fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-        fontSize: 'clamp(0.8rem, 2.8vw, 0.95rem)',
-        color: '#c8bfae', lineHeight: 1.7, margin: 0,
-        textAlign: 'center', maxWidth: 320,
-      }}>
-        This website is optimised for PC. Mobile may experience lag, bugs, and reduced asset quality.
-      </p>
-      <button onClick={onContinue} style={s.btn}>Continue</button>
-      <p style={{
-        position: 'fixed', bottom: 20,
-        fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
-        fontSize: '0.65rem', color: '#3a3428',
-        letterSpacing: '0.08em',
-      }}>TME — Ved (CEO)</p>
+      <div className="m-fade-in">
+        <svg viewBox="0 0 32 32" width="22" height="22" fill="none" stroke="#e8c660" strokeWidth="1.5" style={{ marginBottom: 24, display: 'block', margin: '0 auto 24px' }}>
+          <circle cx="16" cy="16" r="12" />
+          <path d="M12 20 L20 12 M12 12 L20 20" />
+        </svg>
+        <p style={s.warningText}>
+          This website was made for PC.<br />Mobile may experience lag, bugs, or reduced asset quality.
+        </p>
+        <p style={s.footer}>TME — Ved (CEO)</p>
+        <button onClick={onContinue} style={s.btn}>Continue</button>
+      </div>
+    </div>
+  )
+}
+
+/* ─── SCREEN 2: ROTATE ────────────────────────────────── */
+function RotateScreen() {
+  return (
+    <div style={s.root}>
+      <div className="m-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: 130, height: 190, position: 'relative', marginBottom: 36 }}>
+          <svg viewBox="0 0 130 190" width="130" height="190"
+            style={{ animation: 'm-rotate-phone 2.4s ease-in-out infinite' }}>
+            <rect x="8" y="4" width="114" height="182" rx="16" stroke="#e8c660" strokeWidth="2.5" fill="none" />
+            <rect x="22" y="26" width="86" height="125" rx="4" fill="rgba(232,198,96,0.06)" />
+            <line x1="38" y1="14" x2="92" y2="14" stroke="#e8c660" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="65" cy="167" r="7" stroke="#e8c660" strokeWidth="2" fill="none" />
+          </svg>
+          <svg viewBox="0 0 130 190" width="130" height="190"
+            style={{ position: 'absolute', inset: 0, animation: 'm-rotate-arrow 2.4s ease-in-out infinite' }}>
+            <path d="M120 55 A75 75 0 0 1 65 165" stroke="#e8c660" strokeWidth="2" fill="none" strokeDasharray="5 4" />
+            <polygon points="65,165 71,153 59,153" fill="#e8c660" />
+          </svg>
+        </div>
+        <p style={s.label}>Rotate your phone horizontally</p>
+      </div>
+    </div>
+  )
+}
+
+/* ─── SCREEN 3: FULLSCREEN ────────────────────────────── */
+function FullscreenScreen({ onTap }) {
+  function handle(e) {
+    e?.preventDefault()
+    onTap()
+  }
+
+  return (
+    <div
+      onClick={handle}
+      onTouchStart={handle}
+      style={{ ...s.root, cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation' }}
+    >
+      <div className="m-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: 64, height: 100, marginBottom: 12 }}>
+          <svg viewBox="0 0 40 64" width="64" height="100" fill="none">
+            <rect x="4" y="2" width="32" height="60" rx="6" stroke="#e8c660" strokeWidth="2" />
+            <rect x="10" y="10" width="20" height="30" rx="2" fill="rgba(232,198,96,0.06)" />
+            <line x1="12" y1="7" x2="28" y2="7" stroke="#e8c660" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </div>
+        <div className="m-arrow-down" />
+        <div style={{ width: 56, height: 72, margin: '8px 0' }}>
+          <svg viewBox="0 0 40 52" width="56" height="72" fill="none">
+            <path d="M20 36 V14 C20 11 18 9 16 9 C14 9 12 11 12 14 L12 30 L8 26 C6 24 4 23 3 25 C2 27 2 29 4 31 L12 39 C14 42 17 44 22 44 H28 C34 44 38 40 38 34 V18 C38 15 36 13 34 13 C32 13 30 15 30 18 V26"
+              stroke="#e8c660" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M20 36 V8 C20 6 18 4 16 4 C14 4 12 6 12 8 V14"
+              stroke="#e8c660" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="16" cy="3" r="3" fill="#e8c660" opacity="0.5">
+              <animate attributeName="r" values="3;6;3" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0;0.5" dur="1.8s" repeatCount="indefinite" />
+            </circle>
+          </svg>
+        </div>
+        <div className="m-arrow-down" />
+        <div style={{ width: 48, height: 48, margin: '8px 0 28px' }}>
+          <svg viewBox="0 0 40 40" width="48" height="48" fill="none">
+            <rect x="2" y="2" width="36" height="36" rx="4" stroke="#e8c660" strokeWidth="2" />
+            <path d="M8 8 L16 16 M16 8 L8 16" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" />
+            <path d="M32 8 L24 16 M24 8 L32 16" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" />
+            <path d="M8 32 L16 24 M16 32 L8 24" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" />
+            <path d="M32 32 L24 24 M24 32 L32 24" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </div>
+        <p style={s.label}>Tap to Continue</p>
+        <p style={s.sub}>Fullscreen mode will be enabled</p>
+      </div>
+    </div>
+  )
+}
+
+/* ─── SCREEN 4: SNAKE LOADING ─────────────────────────── */
+function SnakeLoadingScreen({ progress, statusText }) {
+  const pct = Math.min(100, Math.max(0, Math.round((progress ?? 0) * 100)))
+  const label = statusText || 'Loading…'
+
+  return (
+    <div style={s.root}>
+      <div style={{ width: 120, height: 120, position: 'relative', marginBottom: 40 }}>
+        <svg viewBox="0 0 100 100" width="120" height="120" className="m-snake-svg">
+          <path id="snake-path"
+            d="M 50 6 C 76 6, 94 24, 94 50 C 94 76, 76 94, 50 94 C 24 94, 6 76, 6 50 C 6 24, 24 6, 50 6"
+            fill="none" stroke="#e8c660" strokeWidth="3"
+            strokeLinecap="round" strokeLinejoin="round"
+            className="m-snake-stroke"
+          />
+        </svg>
+      </div>
+      <div style={{ width: 200, height: 2, background: '#1e1c18', borderRadius: 2, overflow: 'hidden' }}>
+        <div style={{
+          height: '100%', background: '#e8c660', borderRadius: 2,
+          width: `${pct}%`,
+          transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+        }} />
+      </div>
+      <p style={s.statusText}>{label}</p>
     </div>
   )
 }
@@ -161,8 +163,20 @@ const s = {
     color: '#6a5e4a', letterSpacing: '0.04em',
     marginTop: 12, textAlign: 'center', maxWidth: 280,
   },
+  warningText: {
+    fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+    fontSize: 'clamp(0.8rem, 2.8vw, 0.95rem)',
+    color: '#c8bfae', lineHeight: 1.7, margin: 0,
+    textAlign: 'center', maxWidth: 320,
+  },
+  footer: {
+    fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+    fontSize: '0.65rem', color: '#3a3428',
+    letterSpacing: '0.08em', textAlign: 'center',
+    marginTop: 32, marginBottom: 24,
+  },
   btn: {
-    marginTop: 32,
+    display: 'block', margin: '0 auto',
     background: 'transparent',
     border: '1px solid #e8c660',
     borderRadius: 4,
@@ -172,5 +186,14 @@ const s = {
     padding: '10px 28px',
     cursor: 'pointer',
     letterSpacing: '0.06em',
+  },
+  statusText: {
+    fontFamily: '"Inter", ui-sans-serif, system-ui, sans-serif',
+    fontSize: 'clamp(0.7rem, 2.4vw, 0.8rem)',
+    color: '#8a7d6a',
+    letterSpacing: '0.05em',
+    marginTop: 20,
+    textAlign: 'center',
+    minHeight: '1.4em',
   },
 }
