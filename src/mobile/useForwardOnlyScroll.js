@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from 'react'
 
 const ACTIVATION_THRESHOLD = 0.08
 const BACKWARD_TOLERANCE = -0.0005
+const FORWARD_DISMISS = 0.003
 
 export default function useForwardOnlyScroll(progress) {
   const [blocked, setBlocked] = useState(false)
@@ -15,6 +16,11 @@ export default function useForwardOnlyScroll(progress) {
 
   if (progress > peakRef.current) {
     peakRef.current = progress
+  }
+
+  if (blocked && delta > FORWARD_DISMISS) {
+    peakRef.current = progress
+    setBlocked(false)
   }
 
   if (peakRef.current > ACTIVATION_THRESHOLD && delta < BACKWARD_TOLERANCE && !cooldownRef.current) {
