@@ -12,6 +12,7 @@ import applyMobileQuality from './MobileQualityProfile'
 import AdaptiveQuality from './useAdaptiveQuality'
 import useForwardOnlyScroll from './useForwardOnlyScroll'
 import ForwardOnlyOverlay from './ForwardOnlyOverlay'
+import WarmupPhase from './WarmupPhase'
 
 applyMobileQuality()
 
@@ -42,6 +43,7 @@ export default function MobileScene({ prewarm, onRestart }) {
   const progress = Math.max(0, Math.min(1, slowRef.current))
 
   const handleStartAgain = useCallback(() => {
+    console.log('%c[Restart] Returning to first screen', 'color:#e8c660')
     reset()
     onRestart?.()
   }, [reset, onRestart])
@@ -72,6 +74,7 @@ export default function MobileScene({ prewarm, onRestart }) {
                 state.gl.setPixelRatio(Math.min(1, window.devicePixelRatio || 1))
               }}
             >
+              <WarmupPhase />
               <AdaptiveQuality />
               <ScrollCinematicFlow progress={progress} />
             </Canvas>

@@ -372,3 +372,9 @@ body {
   stroke-dashoffset: 280;
   animation: m-snake-slither 2s linear infinite;
 }
+
+@keyframes m-glass-shine {
+  0%   { transform: rotate(-25deg) translateX(-100%); }
+  50%  { transform: rotate(-25deg) translateX(100%); }
+  100% { transform: rotate(-25deg) translateX(100%); }
+}

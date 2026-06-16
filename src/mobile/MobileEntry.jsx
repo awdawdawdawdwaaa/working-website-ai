@@ -143,9 +143,11 @@ export default function MobileEntry() {
       setStatusText('Warming GPU…')
       setProgress(0.68)
       setSceneMounted(true)
+      console.log('%c[Warmup] Scene mounted hidden — compiling shaders', 'color:#8a7d6a')
 
       // ── compile shaders, upload textures ──────────────
       await sleep(1500)
+      console.log('%c[Warmup] Hidden render complete', 'color:#8a7d6a')
 
       setStatusText('Optimising…')
       setProgress(0.80)
@@ -175,8 +177,14 @@ export default function MobileEntry() {
         } catch { return s }
       }, 0)
 
+      const warmupMs = (typeof window !== 'undefined' && window.__MOBILE_WARMUP_MS) || 0
+      const cacheHits = (typeof window !== 'undefined' && window.__MOBILE_CACHE_HITS) || 0
+      const cacheCount = (typeof window !== 'undefined' && window.__MOBILE_CACHE_COUNT) || 0
+
       console.log(
-        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB | Desktop Match OK | Warmup OK | Camera Stable | Restart Flow OK`,
+        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB` +
+        ` | Warmup: ${warmupMs}ms | Cache: ${cacheHits} hits / ${cacheCount} entries` +
+        ` | Desktop Match OK | Camera Stable | Restart Flow OK`,
         'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
       )
 
@@ -185,6 +193,37 @@ export default function MobileEntry() {
 
       // ── show scene, hide loader ──────────────────────
       setSceneVisible(true)
+
+      // ── periodic FPS / draw call log (debug) ────────
+      let samples = 0
+      let lastLog = performance.now()
+      function logMetrics() {
+        try {
+          const canvas = document.querySelector('canvas')
+          if (!canvas) return
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl')
+          if (gl) {
+            const ext = gl.getExtension('EXT_disjoint_timer_query')
+            if (ext) {
+              const query = ext.createQueryEXT()
+              ext.beginQueryEXT(ext.TIME_ELAPSED_EXT, query)
+              ext.endQueryEXT(query)
+            }
+          }
+          samples++
+          const info = window.__R3F_INFO?.gl?.info
+          if (info && samples % 5 === 0) {
+            const fps = Math.round(1000 / ((performance.now() - lastLog) / 5))
+            console.log(
+              `%c[Debug] FPS: ${fps} | Draw Calls: ${info.render?.calls || '?'} | Textures: ${info.memory?.textures || '?'}`,
+              'color:#6a5e4a'
+            )
+          }
+          lastLog = performance.now()
+        } catch {}
+      }
+      const metricTimer = setInterval(logMetrics, 1000)
+      setTimeout(() => clearInterval(metricTimer), 30000)
     }
 
     run()
