@@ -1,10 +1,10 @@
 const STAGES = [
-  { id: 'prep',       label: 'Preparing assets…',      weight: 0.10 },
-  { id: 'models',     label: 'Loading models…',        weight: 0.50 },
-  { id: 'environment', label: 'Loading environment…',  weight: 0.15 },
-  { id: 'textures',   label: 'Optimising textures…',   weight: 0.10 },
-  { id: 'line',       label: 'Building scene…',        weight: 0.10 },
-  { id: 'scene',      label: 'Finalising…',            weight: 0.05 },
+  { id: 'prep',      label: 'Preparing…',           weight: 0.05 },
+  { id: 'models',    label: 'Loading Models…',      weight: 0.55 },
+  { id: 'build',     label: 'Building Scene…',      weight: 0.10 },
+  { id: 'optimise',  label: 'Optimising…',          weight: 0.08 },
+  { id: 'warm',      label: 'Warming GPU…',         weight: 0.12 },
+  { id: 'enter',     label: 'Entering World…',      weight: 0.10 },
 ]
 
 export function getStageForProgress(raw) {

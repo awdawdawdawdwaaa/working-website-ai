@@ -1,9 +1,9 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
+import * as THREE from 'three'
 import useDeviceProfile from './useDeviceProfile'
 import MobileLoader from './MobileLoader'
 import loadMobileAssets from './MobileAssetLoader'
-import { progressToLabel, progressToPct } from './MobileLoadingState'
 import { getAssetEntries } from './AssetMap'
 import { VERSION } from './version'
 import applyMobileQuality from './MobileQualityProfile'
@@ -11,6 +11,10 @@ import VersionDisplay from './version'
 
 const MobileScene = lazy(() => import('./MobileScene'))
 const FORCE_CONTINUE_MS = 30000
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms))
+}
 
 function isLandscape() {
   if (window.screen?.orientation?.angle != null) {
@@ -24,24 +28,20 @@ function isLandscape() {
   return window.innerWidth > window.innerHeight
 }
 
-const PROP_NAMES = {
-  'Meshy_AI_Age_Wall_0611070403_texture.glb': 'Models',
-  'Meshy_AI_Brushed_Steel_City_Sk_0610152611_texture.glb': 'Models',
-  'Meshy_AI_Ahmedabad_Map_Install_0611072026_texture.glb': 'Models',
-  'Meshy_AI_Time_in_Steel_0611065420_texture.glb': 'Models',
-  'Meshy_AI_Python_Development_Ex_0611071109_texture.glb': 'Models',
-  'character.glb': 'Character',
-}
-
 export default function MobileEntry() {
   useDeviceProfile()
-  const [sceneReady, setSceneReady] = useState(false)
+
   const [phase, setPhase] = useState('warning')
   const [progress, setProgress] = useState(0)
   const [statusText, setStatusText] = useState('Preparing assets…')
+  const [sceneMounted, setSceneMounted] = useState(false)
+  const [sceneVisible, setSceneVisible] = useState(false)
+
   const loadingRef = useRef(false)
   const fullscreenDone = useRef(false)
   const forcedRef = useRef(false)
+  const sceneDisposed = useRef(false)
+  const loadedRef = useRef(false)
 
   // ─── WARNING → ROTATE ──────────────────────────────────
   function handleWarningContinue() {
@@ -74,40 +74,78 @@ export default function MobileEntry() {
     setPhase('loading')
   }
 
-  // ─── LOADING ───────────────────────────────────────────
+  // ─── LOADING — min 6s + prewarm ────────────────────────
   useEffect(() => {
     if (phase !== 'loading') return
     if (loadingRef.current) return
     loadingRef.current = true
 
+    applyMobileQuality()
+
+    const startTime = performance.now()
+    const MIN_LOAD_MS = 6000
+
     const forceTimer = setTimeout(() => {
       if (forcedRef.current) return
       forcedRef.current = true
       setProgress(1)
-      setStatusText('Finalising…')
-      setTimeout(() => setSceneReady(true), 1000)
+      setStatusText('Entering World…')
+      setSceneMounted(true)
+      setTimeout(() => setSceneVisible(true), 600)
     }, FORCE_CONTINUE_MS)
 
     async function run() {
       useGLTF.setDecoderPath('/draco/')
 
-      setStatusText('Preparing assets…')
+      setStatusText('Preparing…')
       setProgress(0.05)
+      await sleep(300)
 
-      await new Promise(r => setTimeout(r, 300))
-
-      setStatusText('Loading models…')
+      setStatusText('Loading Models…')
       setProgress(0.10)
 
       const entries = getAssetEntries()
 
       try {
         await loadMobileAssets((val, path) => {
-          const raw = 0.10 + val * 0.75
+          const raw = 0.10 + val * 0.55
           setProgress(raw)
-          setStatusText(progressToLabel(raw))
+          setStatusText('Loading Models…')
         })
       } catch {}
+
+      if (forcedRef.current) return
+
+      loadedRef.current = true
+
+      // ── wait until min 3.5s ───────────────────────────
+      const t1 = performance.now() - startTime
+      if (t1 < 3500) await sleep(3500 - t1)
+
+      setStatusText('Building Scene…')
+      setProgress(0.70)
+
+      // ── mount hidden scene for prewarm ────────────────
+      setStatusText('Warming GPU…')
+      setProgress(0.82)
+      setSceneMounted(true)
+
+      // ── let scene warm (compile shaders, upload textures) ──
+      await sleep(800)
+
+      setStatusText('Optimising…')
+      setProgress(0.90)
+
+      // ── wait until min 5.5s ───────────────────────────
+      const t2 = performance.now() - startTime
+      if (t2 < 5500) await sleep(5500 - t2)
+
+      setStatusText('Entering World…')
+      setProgress(0.97)
+
+      // ── wait until min 6s ─────────────────────────────
+      const t3 = performance.now() - startTime
+      if (t3 < MIN_LOAD_MS) await sleep(MIN_LOAD_MS - t3)
 
       if (forcedRef.current) return
 
@@ -121,31 +159,15 @@ export default function MobileEntry() {
       }, 0)
 
       console.log(
-        `%c[Mobile] Props Loaded%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB compressed`,
-        'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
-      )
-
-      setProgress(0.90)
-      setStatusText('Finalising…')
-      await new Promise(r => setTimeout(r, 1000))
-
-      if (forcedRef.current) return
-
-      setProgress(0.97)
-
-      await new Promise(r => setTimeout(r, 800))
-
-      if (forcedRef.current) return
-
-      applyMobileQuality()
-
-      console.log(
-        `%c[Mobile] %cVersion ${VERSION} — Mobile Quality Enabled, Compressed Props Enabled, Scroll Limiter Enabled`,
+        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB | min ${MIN_LOAD_MS}ms + prewarm`,
         'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
       )
 
       setProgress(1)
-      setSceneReady(true)
+      await sleep(400)
+
+      // ── show scene, hide loader ──────────────────────
+      setSceneVisible(true)
     }
 
     run()
@@ -156,38 +178,50 @@ export default function MobileEntry() {
     }
   }, [phase])
 
+  // ─── MEMORY CONTROL — dispose on unmount ───────────────
+  useEffect(() => {
+    return () => {
+      if (sceneDisposed.current) return
+      sceneDisposed.current = true
+
+      THREE.Cache.clear()
+      loadedRef.current = false
+      loadingRef.current = false
+
+      if (typeof window !== 'undefined') {
+        window.__MOBILE_QUALITY = false
+        window.__MOBILE_QUALITY_LEVEL = undefined
+      }
+    }
+  }, [])
+
   // ─── SCREEN ROUTING ────────────────────────────────────
-  if (phase === 'warning') {
-    return <MobileLoader phase="warning" onContinue={handleWarningContinue} />
-  }
-
-  if (phase === 'rotate') {
-    return <MobileLoader phase="rotate" />
-  }
-
-  if (phase === 'fullscreen') {
-    return <MobileLoader phase="fullscreen" onTap={handleTap} />
-  }
-
-  // ← FIX: loading phase yields when sceneReady=true
-  if (phase === 'loading' && !sceneReady) {
-    return (
-      <MobileLoader
-        phase="loading"
-        progress={progress}
-        statusText={statusText}
-      />
-    )
-  }
-
-  if (!sceneReady) return null
+  const showLoader = phase === 'warning' || phase === 'rotate' || phase === 'fullscreen' || (phase === 'loading' && !sceneVisible)
 
   return (
     <>
-      <Suspense fallback={null}>
-        <MobileScene />
-      </Suspense>
-      <VersionDisplay />
+      {showLoader && (
+        <MobileLoader
+          phase={phase}
+          progress={progress}
+          statusText={statusText}
+          onContinue={handleWarningContinue}
+          onTap={handleTap}
+        />
+      )}
+      {sceneMounted && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 5,
+          opacity: sceneVisible ? 1 : 0,
+          pointerEvents: sceneVisible ? 'auto' : 'none',
+          transition: 'opacity 0.6s ease',
+        }}>
+          <Suspense fallback={null}>
+            <MobileScene prewarm={!sceneVisible} />
+          </Suspense>
+        </div>
+      )}
+      {sceneVisible && <VersionDisplay />}
     </>
   )
 }

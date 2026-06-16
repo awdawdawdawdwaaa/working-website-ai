@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import ScrollCinematicFlow from '../scenes/ScrollCinematicFlow'
@@ -9,19 +9,14 @@ import useScrollScrub from '../core/useScrollScrub'
 import { getSlowFactor } from '../core/narrativeRegistry'
 import useScrollLimiter from './useScrollLimiter'
 import applyMobileQuality from './MobileQualityProfile'
-import VersionDisplay from './version'
+import AdaptiveQuality from './useAdaptiveQuality'
 
 applyMobileQuality()
 
-export default function MobileScene() {
+export default function MobileScene({ prewarm }) {
   const { progress: rawProgress } = useScrollScrub()
   const prevRawRef = useRef(rawProgress)
   const slowRef = useRef(rawProgress)
-  const [fadeIn, setFadeIn] = useState(false)
-
-  useEffect(() => {
-    requestAnimationFrame(() => setFadeIn(true))
-  }, [])
 
   const rawDelta = rawProgress - prevRawRef.current
   prevRawRef.current = rawProgress
@@ -43,14 +38,15 @@ export default function MobileScene() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 5,
-      opacity: fadeIn ? 1 : 0,
+      opacity: prewarm ? 0 : 1,
+      pointerEvents: prewarm ? 'none' : 'auto',
       transition: 'opacity 0.6s ease',
     }}>
       <IntroOverlay />
       <main className="cinematic-shell">
         <div className="canvas-stage">
           <Canvas
-            dpr={[1, 1]}
+            dpr={[0.75, 1]}
             shadows={false}
             camera={{ position: [0, 1.60, -1.20], fov: 40.5, near: 0.1, far: 80 }}
             gl={{
@@ -60,7 +56,11 @@ export default function MobileScene() {
               toneMappingExposure: 0.9,
             }}
             style={{ background: '#0c0b0a' }}
+            onCreated={(state) => {
+              state.gl.setPixelRatio(Math.min(1, window.devicePixelRatio || 1))
+            }}
           >
+            <AdaptiveQuality />
             <ScrollCinematicFlow progress={progress} />
           </Canvas>
         </div>
