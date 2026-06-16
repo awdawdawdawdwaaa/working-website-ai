@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, useCallback } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import useDeviceProfile from './useDeviceProfile'
@@ -10,7 +10,7 @@ import applyMobileQuality from './MobileQualityProfile'
 import VersionDisplay from './version'
 
 const MobileScene = lazy(() => import('./MobileScene'))
-const FORCE_CONTINUE_MS = 30000
+const FORCE_CONTINUE_MS = 45000
 
 function sleep(ms) {
   return new Promise(r => setTimeout(r, ms))
@@ -36,12 +36,26 @@ export default function MobileEntry() {
   const [statusText, setStatusText] = useState('Preparing assets…')
   const [sceneMounted, setSceneMounted] = useState(false)
   const [sceneVisible, setSceneVisible] = useState(false)
+  const [restartKey, setRestartKey] = useState(0)
 
   const loadingRef = useRef(false)
   const fullscreenDone = useRef(false)
   const forcedRef = useRef(false)
   const sceneDisposed = useRef(false)
-  const loadedRef = useRef(false)
+
+  function resetState() {
+    setPhase('warning')
+    setProgress(0)
+    setStatusText('Preparing assets…')
+    setSceneMounted(false)
+    setSceneVisible(false)
+    loadingRef.current = false
+    fullscreenDone.current = false
+    forcedRef.current = false
+    sceneDisposed.current = false
+    THREE.Cache.clear()
+    setRestartKey(k => k + 1)
+  }
 
   // ─── WARNING → ROTATE ──────────────────────────────────
   function handleWarningContinue() {
@@ -74,7 +88,7 @@ export default function MobileEntry() {
     setPhase('loading')
   }
 
-  // ─── LOADING — min 6s + prewarm ────────────────────────
+  // ─── LOADING — min 10s + prewarm + stability ────────────
   useEffect(() => {
     if (phase !== 'loading') return
     if (loadingRef.current) return
@@ -83,7 +97,7 @@ export default function MobileEntry() {
     applyMobileQuality()
 
     const startTime = performance.now()
-    const MIN_LOAD_MS = 6000
+    const MIN_LOAD_MS = 10000
 
     const forceTimer = setTimeout(() => {
       if (forcedRef.current) return
@@ -98,52 +112,54 @@ export default function MobileEntry() {
       useGLTF.setDecoderPath('/draco/')
 
       setStatusText('Preparing…')
-      setProgress(0.05)
+      setProgress(0.03)
       await sleep(300)
 
       setStatusText('Loading Models…')
-      setProgress(0.10)
+      setProgress(0.08)
 
       const entries = getAssetEntries()
 
       try {
         await loadMobileAssets((val, path) => {
-          const raw = 0.10 + val * 0.55
+          const raw = 0.08 + val * 0.42
           setProgress(raw)
-          setStatusText('Loading Models…')
         })
       } catch {}
 
       if (forcedRef.current) return
 
-      loadedRef.current = true
-
-      // ── wait until min 3.5s ───────────────────────────
+      // ── wait until min 4s ───────────────────────────
       const t1 = performance.now() - startTime
-      if (t1 < 3500) await sleep(3500 - t1)
+      if (t1 < 4000) await sleep(4000 - t1)
 
       setStatusText('Building Scene…')
-      setProgress(0.70)
+      setProgress(0.55)
+
+      await sleep(600)
 
       // ── mount hidden scene for prewarm ────────────────
       setStatusText('Warming GPU…')
-      setProgress(0.82)
+      setProgress(0.68)
       setSceneMounted(true)
 
-      // ── let scene warm (compile shaders, upload textures) ──
-      await sleep(800)
+      // ── compile shaders, upload textures ──────────────
+      await sleep(1500)
 
       setStatusText('Optimising…')
+      setProgress(0.80)
+
+      // ── wait until min 7s ───────────────────────────
+      const t2 = performance.now() - startTime
+      if (t2 < 7000) await sleep(7000 - t2)
+
+      setStatusText('Stabilising…')
       setProgress(0.90)
 
-      // ── wait until min 5.5s ───────────────────────────
-      const t2 = performance.now() - startTime
-      if (t2 < 5500) await sleep(5500 - t2)
+      // ── stability check ──────────────────────────────
+      await sleep(1500)
 
-      setStatusText('Entering World…')
-      setProgress(0.97)
-
-      // ── wait until min 6s ─────────────────────────────
+      // ── wait until min 10s ──────────────────────────
       const t3 = performance.now() - startTime
       if (t3 < MIN_LOAD_MS) await sleep(MIN_LOAD_MS - t3)
 
@@ -159,12 +175,12 @@ export default function MobileEntry() {
       }, 0)
 
       console.log(
-        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB | min ${MIN_LOAD_MS}ms + prewarm`,
+        `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB | min ${MIN_LOAD_MS}ms`,
         'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
       )
 
       setProgress(1)
-      await sleep(400)
+      await sleep(500)
 
       // ── show scene, hide loader ──────────────────────
       setSceneVisible(true)
@@ -183,16 +199,18 @@ export default function MobileEntry() {
     return () => {
       if (sceneDisposed.current) return
       sceneDisposed.current = true
-
       THREE.Cache.clear()
-      loadedRef.current = false
       loadingRef.current = false
-
       if (typeof window !== 'undefined') {
         window.__MOBILE_QUALITY = false
         window.__MOBILE_QUALITY_LEVEL = undefined
       }
     }
+  }, [])
+
+  // ─── RESTART ──────────────────────────────────────────
+  const handleRestart = useCallback(() => {
+    resetState()
   }, [])
 
   // ─── SCREEN ROUTING ────────────────────────────────────
@@ -216,12 +234,12 @@ export default function MobileEntry() {
           pointerEvents: sceneVisible ? 'auto' : 'none',
           transition: 'opacity 0.6s ease',
         }}>
-          <Suspense fallback={null}>
-            <MobileScene prewarm={!sceneVisible} />
+          <Suspense fallback={null} key={restartKey}>
+            <MobileScene prewarm={!sceneVisible} onRestart={handleRestart} />
           </Suspense>
         </div>
       )}
-      {sceneVisible && <VersionDisplay />}
+      <VersionDisplay />
     </>
   )
 }
