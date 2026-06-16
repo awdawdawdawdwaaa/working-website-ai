@@ -107,7 +107,7 @@ function FullscreenScreen({ onTap }) {
             <path d="M32 32 L24 24 M24 32 L32 24" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </div>
-        <p style={s.label}>Tap to Continue</p>
+        <p style={{ ...s.label, writingMode: 'horizontal-tb' }}>Tap to Continue</p>
         <p style={s.sub}>Fullscreen mode will be enabled</p>
       </div>
     </div>
