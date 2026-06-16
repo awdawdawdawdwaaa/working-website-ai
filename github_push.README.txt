@@ -45,3 +45,12 @@ SHORTCUT FILES
   push.sh    — Mac/Linux shell script (run with  ./push.sh)
 
 ═══════════════════════════════════════════════════════════════
+updatehoto - cd "F:\saved website 2\saved 1"
+
+git status
+
+git add .
+ 09
+git add .
+>> git commit -m "update"
+>> git push

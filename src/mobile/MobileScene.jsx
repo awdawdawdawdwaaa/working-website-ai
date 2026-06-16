@@ -16,10 +16,14 @@ import WarmupPhase from './WarmupPhase'
 
 applyMobileQuality()
 
+const SNAP_THRESHOLD = 0.0005
+const DRIFT_DEADZONE = 0.00001
+
 export default function MobileScene({ prewarm, onRestart }) {
-  const { progress: rawProgress } = useScrollScrub()
+  const { progress: rawProgress, target: rawTarget } = useScrollScrub()
   const prevRawRef = useRef(rawProgress)
   const slowRef = useRef(rawProgress)
+  const idleFrames = useRef(0)
 
   const { blocked, effectiveProgress, reset } = useForwardOnlyScroll(rawProgress)
 
@@ -38,6 +42,29 @@ export default function MobileScene({ prewarm, onRestart }) {
   } else if (limitedDelta < 0) {
     slowRef.current += limitedDelta
     slowRef.current = Math.max(slowRef.current, baseProgress)
+  }
+
+  // ── deadzone: stop drift when user stops scrolling ──
+  const drift = Math.abs(baseProgress - slowRef.current)
+  if (Math.abs(limitedDelta) < DRIFT_DEADZONE) {
+    idleFrames.current++
+  } else {
+    idleFrames.current = 0
+  }
+  if (drift < SNAP_THRESHOLD && idleFrames.current > 3) {
+    slowRef.current = baseProgress
+  } else if (drift < 0.0001) {
+    slowRef.current = baseProgress
+  }
+
+  // ── scroll velocity log (every 5 frames) ──
+  const logCounter = useRef(0)
+  logCounter.current++
+  if (logCounter.current % 5 === 0 && Math.abs(limitedDelta) > 0.001) {
+    console.log(
+      `%c[Scroll] Velocity: ${(limitedDelta * 1000).toFixed(2)}e-3 | Target: ${(rawTarget * 100).toFixed(1)}% | Actual: ${(baseProgress * 100).toFixed(1)}% | FrameGap: ${(drift * 100).toFixed(2)}%`,
+      'color:#6a5e4a'
+    )
   }
 
   const progress = Math.max(0, Math.min(1, slowRef.current))

@@ -184,7 +184,7 @@ export default function MobileEntry() {
       console.log(
         `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB` +
         ` | Warmup: ${warmupMs}ms | Cache: ${cacheHits} hits / ${cacheCount} entries` +
-        ` | Desktop Match OK | Camera Stable | Restart Flow OK`,
+        ` | Desktop Match OK | Scroll Deadzone ON | Camera Stable | Restart Flow OK`,
         'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
       )
 
@@ -194,36 +194,27 @@ export default function MobileEntry() {
       // ── show scene, hide loader ──────────────────────
       setSceneVisible(true)
 
-      // ── periodic FPS / draw call log (debug) ────────
-      let samples = 0
-      let lastLog = performance.now()
-      function logMetrics() {
-        try {
-          const canvas = document.querySelector('canvas')
-          if (!canvas) return
-          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl')
-          if (gl) {
-            const ext = gl.getExtension('EXT_disjoint_timer_query')
-            if (ext) {
-              const query = ext.createQueryEXT()
-              ext.beginQueryEXT(ext.TIME_ELAPSED_EXT, query)
-              ext.endQueryEXT(query)
-            }
-          }
-          samples++
-          const info = window.__R3F_INFO?.gl?.info
-          if (info && samples % 5 === 0) {
-            const fps = Math.round(1000 / ((performance.now() - lastLog) / 5))
+      // ── render bottleneck scan (logs when frame time > 20ms) ──
+      let lastFrame = performance.now()
+      let badFrames = 0
+      function checkFrameTime() {
+        const now = performance.now()
+        const ft = now - lastFrame
+        lastFrame = now
+        if (ft > 20) {
+          badFrames++
+          if (badFrames <= 3) {
             console.log(
-              `%c[Debug] FPS: ${fps} | Draw Calls: ${info.render?.calls || '?'} | Textures: ${info.memory?.textures || '?'}`,
-              'color:#6a5e4a'
+              `%c[FrameTime] Slow frame: ${ft.toFixed(1)}ms (target: <16.7ms) | Rerender: ${badFrames}`,
+              'color:#c8a050'
             )
           }
-          lastLog = performance.now()
-        } catch {}
+        } else {
+          badFrames = 0
+        }
       }
-      const metricTimer = setInterval(logMetrics, 1000)
-      setTimeout(() => clearInterval(metricTimer), 30000)
+      const ftTimer = setInterval(checkFrameTime, 100)
+      setTimeout(() => clearInterval(ftTimer), 30000)
     }
 
     run()
