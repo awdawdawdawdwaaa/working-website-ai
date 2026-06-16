@@ -184,7 +184,7 @@ export default function MobileEntry() {
       console.log(
         `%c[Mobile] v${VERSION}%c ${entries.length} assets, ~${(totalBytes / 1024).toFixed(0)} KB` +
         ` | Warmup: ${warmupMs}ms | Cache: ${cacheHits} hits / ${cacheCount} entries` +
-        ` | Desktop Match OK | Scroll Deadzone ON | Camera Stable | Restart Flow OK`,
+        ` | MemoUI ON | RenderProfile ON | Deadzone ON | Desktop Match OK | Camera Stable`,
         'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
       )
 

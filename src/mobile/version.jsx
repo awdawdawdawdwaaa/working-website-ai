@@ -1,4 +1,4 @@
-export const VERSION = '0.4-c'
+export const VERSION = '0.4-d'
 
 export default function VersionDisplay() {
   return (

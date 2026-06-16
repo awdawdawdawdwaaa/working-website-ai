@@ -1,57 +1,59 @@
-import { useEffect, useState } from 'react'
-import { useThree } from '@react-three/fiber'
+import { useEffect, useState, useRef } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
 import { VERSION } from './version'
 
-const MINI = {
+const S = {
   position: 'fixed',
-  top: 10,
+  bottom: 32,
   right: 10,
   zIndex: 99999,
   fontFamily: 'monospace',
-  fontSize: '9px',
-  color: 'rgba(255,255,255,0.4)',
-  lineHeight: 1.5,
+  fontSize: '8px',
+  color: 'rgba(255,255,255,0.3)',
+  lineHeight: 1.6,
   textAlign: 'right',
   pointerEvents: 'none',
   userSelect: 'none',
-  WebkitUserSelect: 'none',
 }
 
-export function DebugOverlay() {
+const memStore = { fps: 0, draws: 0, textures: 0, geos: 0 }
+
+export function DebugCanvasMetrics() {
   const { gl } = useThree()
-  const [fps, setFps] = useState(0)
-  const [draws, setDraws] = useState(0)
-  const [tex, setTex] = useState(0)
+  const fc = useRef(0)
+  const lt = useRef(performance.now())
 
-  useEffect(() => {
-    let raf
-    let last = performance.now()
-    let frames = 0
-
-    function tick() {
-      raf = requestAnimationFrame(tick)
-      frames++
-      const now = performance.now()
-      if (now - last >= 1000) {
-        setFps(frames)
-        setDraws(gl.info.render?.calls ?? 0)
-        setTex(gl.info.memory?.textures ?? 0)
-        frames = 0
-        last = now
-      }
-    }
-
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [gl])
+  useFrame(() => {
+    fc.current++
+    const now = performance.now()
+    if (now - lt.current < 500) return
+    const fps = Math.round(fc.current / ((now - lt.current) / 1000))
+    fc.current = 0
+    lt.current = now
+    const info = gl.info
+    memStore.fps = fps
+    memStore.draws = info.render?.calls ?? 0
+    memStore.textures = info.memory?.textures ?? 0
+    memStore.geos = info.memory?.geometries ?? 0
+  })
 
   return null
 }
 
 export default function MobileDebugStats() {
+  const [m, setM] = useState({ ...memStore })
+
+  useEffect(() => {
+    const t = setInterval(() => setM({ ...memStore }), 1000)
+    return () => clearInterval(t)
+  }, [])
+
   return (
-    <div style={MINI}>
-      v{VERSION}
+    <div style={S}>
+      v{VERSION}<br />
+      {m.fps} FPS<br />
+      {m.draws} draws<br />
+      {m.textures} tex
     </div>
   )
 }

@@ -1,15 +1,14 @@
 import { useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
-import * as THREE from 'three'
 import ScrollCinematicFlow from '../scenes/ScrollCinematicFlow'
-import CinematicOverlay from '../ui/CinematicOverlay'
-import CinematicTextSystem from '../ui/CinematicTextSystem'
 import IntroOverlay from '../ui/IntroOverlay'
 import useScrollScrub from '../core/useScrollScrub'
 import { getSlowFactor } from '../core/narrativeRegistry'
 import useScrollLimiter from './useScrollLimiter'
 import applyMobileQuality from './MobileQualityProfile'
+import { applyRendererProfile, MOBILE_RENDERER } from './MobileRendererProfile'
 import AdaptiveQuality from './useAdaptiveQuality'
+import { MemoizedOverlay, MemoizedTextSystem } from './MobileMemoUI'
 import useForwardOnlyScroll from './useForwardOnlyScroll'
 import ForwardOnlyOverlay from './ForwardOnlyOverlay'
 import WarmupPhase from './WarmupPhase'
@@ -87,18 +86,13 @@ export default function MobileScene({ prewarm, onRestart }) {
         <main className="cinematic-shell">
           <div className="canvas-stage">
             <Canvas
-              dpr={[0.75, 1]}
-              shadows={false}
-              camera={{ position: [0, 1.60, -1.20], fov: 40.5, near: 0.1, far: 80 }}
-              gl={{
-                antialias: false,
-                powerPreference: 'high-performance',
-                toneMapping: THREE.ACESFilmicToneMapping,
-                toneMappingExposure: 0.9,
-              }}
+              dpr={MOBILE_RENDERER.dpr}
+              shadows={MOBILE_RENDERER.shadows}
+              camera={MOBILE_RENDERER.camera}
+              gl={MOBILE_RENDERER.gl}
               style={{ background: '#0c0b0a' }}
               onCreated={(state) => {
-                state.gl.setPixelRatio(Math.min(1, window.devicePixelRatio || 1))
+                applyRendererProfile(state.gl)
               }}
             >
               <WarmupPhase />
@@ -106,8 +100,8 @@ export default function MobileScene({ prewarm, onRestart }) {
               <ScrollCinematicFlow progress={progress} />
             </Canvas>
           </div>
-          <CinematicOverlay progress={progress} />
-          <CinematicTextSystem progress={progress} />
+          <MemoizedOverlay progress={progress} />
+          <MemoizedTextSystem progress={progress} />
           <div className="film-grain" aria-hidden="true" />
           <div className="scroll-track" aria-hidden="true" />
         </main>
