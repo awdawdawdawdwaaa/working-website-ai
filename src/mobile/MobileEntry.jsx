@@ -5,6 +5,9 @@ import MobileLoader from './MobileLoader'
 import loadMobileAssets from './MobileAssetLoader'
 import { progressToLabel, progressToPct } from './MobileLoadingState'
 import { getAssetEntries } from './AssetMap'
+import { VERSION } from './version'
+import applyMobileQuality from './MobileQualityProfile'
+import VersionDisplay from './version'
 
 const MobileScene = lazy(() => import('./MobileScene'))
 const FORCE_CONTINUE_MS = 30000
@@ -134,6 +137,13 @@ export default function MobileEntry() {
 
       if (forcedRef.current) return
 
+      applyMobileQuality()
+
+      console.log(
+        `%c[Mobile] %cVersion ${VERSION} — Mobile Quality Enabled, Compressed Props Enabled, Scroll Limiter Enabled`,
+        'color:#e8c660;font-weight:bold', 'color:#8a7d6a'
+      )
+
       setProgress(1)
       setSceneReady(true)
     }
@@ -173,8 +183,11 @@ export default function MobileEntry() {
   if (!sceneReady) return null
 
   return (
-    <Suspense fallback={null}>
-      <MobileScene />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <MobileScene />
+      </Suspense>
+      <VersionDisplay />
+    </>
   )
 }

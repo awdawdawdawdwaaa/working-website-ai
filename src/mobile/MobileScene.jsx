@@ -7,6 +7,11 @@ import CinematicTextSystem from '../ui/CinematicTextSystem'
 import IntroOverlay from '../ui/IntroOverlay'
 import useScrollScrub from '../core/useScrollScrub'
 import { getSlowFactor } from '../core/narrativeRegistry'
+import useScrollLimiter from './useScrollLimiter'
+import applyMobileQuality from './MobileQualityProfile'
+import VersionDisplay from './version'
+
+applyMobileQuality()
 
 export default function MobileScene() {
   const { progress: rawProgress } = useScrollScrub()
@@ -21,13 +26,15 @@ export default function MobileScene() {
   const rawDelta = rawProgress - prevRawRef.current
   prevRawRef.current = rawProgress
 
-  if (rawDelta > 0) {
+  const limitedDelta = useScrollLimiter(rawDelta)
+
+  if (limitedDelta > 0) {
     const sf = getSlowFactor()
     const lag = Math.max(0, rawProgress - slowRef.current)
-    slowRef.current += rawDelta * sf + lag * 0.04
+    slowRef.current += limitedDelta * sf + lag * 0.04
     slowRef.current = Math.min(slowRef.current, rawProgress)
-  } else {
-    slowRef.current += rawDelta
+  } else if (limitedDelta < 0) {
+    slowRef.current += limitedDelta
     slowRef.current = Math.max(slowRef.current, rawProgress)
   }
 
