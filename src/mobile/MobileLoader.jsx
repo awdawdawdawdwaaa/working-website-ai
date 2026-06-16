@@ -92,11 +92,19 @@ function RotateScreen() {
   )
 }
 
-/* ─── SCREEN 3: FULLSCREEN — minimal tap to continue ──── */
+/* ─── SCREEN 3: FULLSCREEN — realistic touch animation ──── */
 function FullscreenScreen({ onTap }) {
   function handle(e) {
     e?.preventDefault()
     onTap()
+  }
+
+  const RING = {
+    position: 'absolute', top: '50%', left: '50%',
+    transform: 'translate(-50%, -50%)',
+    borderRadius: '50%',
+    border: '1.2px solid #e8c660',
+    opacity: 0,
   }
 
   return (
@@ -112,38 +120,41 @@ function FullscreenScreen({ onTap }) {
             <rect x="16" y="18" width="68" height="116" rx="3" fill="rgba(232,198,96,0.02)" stroke="#e8c660" strokeWidth="0.3" opacity="0.15" />
             <line x1="24" y1="28" x2="76" y2="28" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
             <line x1="24" y1="38" x2="66" y2="38" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
-            <line x1="24" y1="48" x2="72" y2="48" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
-            <line x1="24" y1="58" x2="60" y2="58" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
-            <line x1="24" y1="68" x2="74" y2="68" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
-            <line x1="24" y1="78" x2="56" y2="78" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
-            <line x1="24" y1="88" x2="70" y2="88" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
-            <line x1="24" y1="98" x2="62" y2="98" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="52" x2="72" y2="52" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="66" x2="60" y2="66" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="80" x2="74" y2="80" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
+            <line x1="24" y1="94" x2="56" y2="94" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
             <line x1="24" y1="108" x2="68" y2="108" stroke="#e8c660" strokeWidth="0.4" opacity="0.1" />
             <circle cx="50" cy="130" r="3" stroke="#e8c660" strokeWidth="0.6" opacity="0.25" />
             <line x1="40" y1="11" x2="60" y2="11" stroke="#e8c660" strokeWidth="2" strokeLinecap="round" opacity="0.25" />
           </svg>
+
           <div style={{
-            position: 'absolute', top: '38%', left: '50%',
-            transform: 'translateX(-50%)',
-            animation: 'm-hand-tap 3.5s ease-in-out infinite',
-          }}>
-            <svg viewBox="0 0 24 32" width="20" height="28" fill="none">
-              <path d="M12 2 C8 4 5 8 5 14 C5 20 7 26 11 28 C12.5 29 13.5 29 15 28 C19 26 21 20 21 14 C21 8 18 4 14 2 C13 1.5 13 1.5 12 2Z"
-                fill="#f5efe4" opacity="0.85" />
-            </svg>
-          </div>
-          <div style={{
-            position: 'absolute', top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            animation: 'm-tap-ripple 3.5s ease-out infinite',
+            position: 'absolute', top: '17%', left: '23%', right: '23%', bottom: '22%',
+            borderRadius: 3, overflow: 'hidden', pointerEvents: 'none',
           }}>
             <div style={{
-              width: 18, height: 18,
-              border: '1.5px solid #e8c660',
-              borderRadius: '50%',
-              opacity: 0,
+              position: 'absolute', inset: 0,
+              background: 'radial-gradient(circle at 50% 45%, #e8c660 0%, transparent 70%)',
+              animation: 'm-screen-flash 4s ease-in-out infinite',
             }} />
           </div>
+
+          <div style={{
+            position: 'absolute', top: '36%', left: '50%',
+            transform: 'translateX(-50%)',
+            animation: 'm-hand-tap 4s ease-in-out infinite',
+          }}>
+            <svg viewBox="0 0 26 38" width="22" height="32" fill="none">
+              <path d="M13 2 C9 3 6 7 5 13 C4 18 5 23 8 27 C10 29.5 12 30.5 14 30 C17 28 20 24 21 18 C22 12 20 5 16 2 Z"
+                fill="#f5efe4" opacity="0.88" />
+              <path d="M20 19 Q19 24 17 27" stroke="#e8c660" strokeWidth="0.5" fill="none" opacity="0.35" />
+            </svg>
+          </div>
+
+          <div style={{ ...RING, width: 16, height: 16, animation: 'm-tap-ring 4s ease-out infinite' }} />
+          <div style={{ ...RING, width: 22, height: 22, animation: 'm-tap-ring 4s ease-out 0.12s infinite' }} />
+          <div style={{ ...RING, width: 30, height: 30, animation: 'm-tap-ring 4s ease-out 0.24s infinite' }} />
         </div>
         <p style={{ ...s.label, color: '#f5efe4' }}>Tap to Continue</p>
         <p style={s.sub}>Fullscreen mode will be enabled</p>

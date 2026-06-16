@@ -381,19 +381,26 @@ body {
 
 /* ─── Mobile v0.5 — tap animations ────────────────────────── */
 @keyframes m-hand-tap {
-  0%, 100% { transform: translateY(-30px); }
-  25% { transform: translateY(-30px); }
-  45% { transform: translateY(2px); }
-  48% { transform: translateY(0px); }
-  52% { transform: translateY(-5px); }
-  65% { transform: translateY(-30px); }
+  0%, 100% { transform: translateY(-32px); }
+  22% { transform: translateY(-32px); }
+  36% { transform: translateY(3px); }
+  39% { transform: translateY(0); }
+  43% { transform: translateY(-3px); }
+  52% { transform: translateY(-32px); }
 }
 
-@keyframes m-tap-ripple {
-  0%, 42% { transform: scale(0.15); opacity: 0.4; }
-  48% { transform: scale(0.5); opacity: 0.35; }
-  65% { transform: scale(2.2); opacity: 0; }
-  100% { transform: scale(2.2); opacity: 0; }
+@keyframes m-tap-ring {
+  0%, 38% { transform: scale(0.15); opacity: 0.45; }
+  43% { transform: scale(0.5); opacity: 0.35; }
+  65% { transform: scale(2.8); opacity: 0; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+@keyframes m-screen-flash {
+  0%, 38% { opacity: 0; }
+  42% { opacity: 0.12; }
+  55% { opacity: 0; }
+  100% { opacity: 0; }
 }
 
 @keyframes m-rotate-arc {
