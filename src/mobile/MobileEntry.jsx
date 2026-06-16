@@ -42,6 +42,22 @@ export default function MobileEntry() {
   const fullscreenDone = useRef(false)
   const forcedRef = useRef(false)
   const sceneDisposed = useRef(false)
+  const wakeLockRef = useRef(null)
+
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator && navigator.wakeLock) {
+        wakeLockRef.current = await navigator.wakeLock.request('screen')
+      }
+    } catch {}
+  }
+
+  function releaseWakeLock() {
+    if (wakeLockRef.current) {
+      try { wakeLockRef.current.release() } catch {}
+      wakeLockRef.current = null
+    }
+  }
 
   function resetState() {
     setPhase('warning')
@@ -79,12 +95,50 @@ export default function MobileEntry() {
     }
   }, [phase])
 
+  // ─── TEMP LOGS — Version + Stage ─────────────────────
+  useEffect(() => {
+    console.log(`%c[Mobile] Version ${VERSION}`, 'color:#e8c660;font-weight:bold')
+    console.log(`%c[Stage] Current: ${phase}`, 'color:#8a7d6a')
+  }, [])
+
+  useEffect(() => {
+    if (phase === 'loading') return
+    console.log(`%c[Stage] Current: ${phase}`, 'color:#8a7d6a')
+  }, [phase])
+
+  useEffect(() => {
+    if (!sceneMounted) return
+    console.log(`%c[Screen] ${sceneVisible ? 'Visible' : 'Hidden'}`, 'color:#6aba6a')
+  }, [sceneVisible, sceneMounted])
+
+  // ─── WAKE LOCK — never sleep mode ──────────────────────
+  useEffect(() => {
+    requestWakeLock()
+    console.log('%c[WakeLock] Active', 'color:#6aba6a')
+
+    function onVisibility() {
+      if (document.hidden) {
+        releaseWakeLock()
+      } else {
+        requestWakeLock()
+        console.log('%c[WakeLock] Active', 'color:#6aba6a')
+      }
+    }
+
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      releaseWakeLock()
+    }
+  }, [])
+
   // ─── FULLSCREEN TAP ────────────────────────────────────
   function handleTap() {
     if (fullscreenDone.current) return
     fullscreenDone.current = true
     try { document.documentElement.requestFullscreen?.() } catch {}
-    try { navigator.wakeLock?.request('screen')?.catch(() => {}) } catch {}
+    requestWakeLock()
+    console.log('%c[WakeLock] Active', 'color:#6aba6a')
     setPhase('loading')
   }
 
