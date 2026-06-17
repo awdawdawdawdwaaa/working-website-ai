@@ -11,6 +11,7 @@ import AdaptiveQuality from './useAdaptiveQuality'
 import { MemoizedOverlay, MemoizedTextSystem } from './MobileMemoUI'
 import useForwardOnlyScroll from './useForwardOnlyScroll'
 import ForwardOnlyOverlay from './ForwardOnlyOverlay'
+import MobileScrollHint from './MobileScrollHint'
 import WarmupPhase from './WarmupPhase'
 import FrameScheduler from './FrameScheduler'
 
@@ -26,7 +27,9 @@ export default function MobileScene({ prewarm, onRestart }) {
   const idleFrames = useRef(0)
 
   const [isScrolling, setIsScrolling] = useState(false)
+  const [showHint, setShowHint] = useState(true)
   const scrollTimer = useRef(null)
+  const firstScrollRef = useRef(false)
 
   useEffect(() => {
     setIsScrolling(true)
@@ -35,6 +38,13 @@ export default function MobileScene({ prewarm, onRestart }) {
       setIsScrolling(false)
     }, 500)
   }, [rawProgress])
+
+  useEffect(() => {
+    if (!prewarm && rawProgress > 0.015 && !firstScrollRef.current) {
+      firstScrollRef.current = true
+      setShowHint(false)
+    }
+  }, [prewarm, rawProgress])
 
   const { blocked, effectiveProgress, reset } = useForwardOnlyScroll(rawProgress)
 
@@ -74,6 +84,8 @@ export default function MobileScene({ prewarm, onRestart }) {
     onRestart?.()
   }, [reset, onRestart])
 
+  const hintVisible = !prewarm && (showHint || blocked)
+
   return (
     <>
       <div style={{
@@ -108,7 +120,8 @@ export default function MobileScene({ prewarm, onRestart }) {
           <div className="scroll-track" aria-hidden="true" />
         </main>
       </div>
-      {blocked && <ForwardOnlyOverlay onStartAgain={handleStartAgain} />}
+      <ForwardOnlyOverlay visible={blocked} onStartAgain={handleStartAgain} />
+      <MobileScrollHint visible={hintVisible} />
     </>
   )
 }

@@ -1,9 +1,11 @@
-export default function ForwardOnlyOverlay({ onStartAgain }) {
+export default function ForwardOnlyOverlay({ visible, onStartAgain }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 999999,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      animation: 'm-fade-in 0.4s ease both',
+      opacity: visible ? 1 : 0,
+      pointerEvents: visible ? 'auto' : 'none',
+      transition: 'opacity 0.7s ease',
       background: 'rgba(255,255,255,0.80)',
     }}>
       <div style={{

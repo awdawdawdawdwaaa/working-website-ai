@@ -101,58 +101,46 @@ function RotateScreen() {
   )
 }
 
-/* ─── SCREEN 3: FULLSCREEN — tap with finger + ripple ── */
+/* ─── SCREEN 3: FULLSCREEN — landscape phone + single ripple ── */
 function FullscreenScreen({ onTap }) {
+  const tapped = { current: false }
   function handle(e) {
+    if (tapped.current) return
+    tapped.current = true
     e?.preventDefault()
     onTap()
-  }
-
-  const RING = {
-    position: 'absolute', top: '50%', left: '50%',
-    transform: 'translate(-50%, -50%)',
-    borderRadius: '50%',
-    border: '1px solid #e8c660',
-    opacity: 0,
   }
 
   return (
     <div
       onClick={handle}
-      onTouchStart={handle}
+      onPointerDown={handle}
       style={{ ...s.root, cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation' }}
     >
       <div className="m-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 360, padding: '0 24px' }}>
-        <div style={{ width: 'clamp(75px, 24vw, 125px)', height: 'clamp(110px, 34vw, 180px)', position: 'relative', marginBottom: 'clamp(20px, 4vh, 32px)' }}>
-          <svg viewBox="0 0 100 150" width="100%" height="100%" fill="none">
-            <rect x="10" y="4" width="80" height="142" rx="16" stroke={W} strokeWidth="1" opacity="0.8" />
-            <rect x="18" y="20" width="64" height="112" rx="4" fill="rgba(245,239,228,0.012)" />
-            <rect x="18" y="20" width="64" height="112" rx="4" stroke={W} strokeWidth="0.25" opacity="0.1" />
-            <circle cx="50" cy="146" r="3" stroke={W} strokeWidth="0.5" opacity="0.25" />
-            <line x1="38" y1="12" x2="62" y2="12" stroke={W} strokeWidth="1.8" strokeLinecap="round" opacity="0.3" />
-            <line x1="26" y1="30" x2="74" y2="30" stroke={W} strokeWidth="0.3" opacity="0.08" />
-            <line x1="26" y1="46" x2="62" y2="46" stroke={W} strokeWidth="0.3" opacity="0.08" />
-            <line x1="26" y1="62" x2="70" y2="62" stroke={W} strokeWidth="0.3" opacity="0.08" />
-            <line x1="26" y1="78" x2="56" y2="78" stroke={W} strokeWidth="0.3" opacity="0.08" />
-            <line x1="26" y1="94" x2="66" y2="94" stroke={W} strokeWidth="0.3" opacity="0.08" />
-            <line x1="26" y1="110" x2="58" y2="110" stroke={W} strokeWidth="0.3" opacity="0.08" />
+        <div style={{ width: 'clamp(110px, 34vw, 180px)', height: 'clamp(75px, 24vw, 125px)', position: 'relative', marginBottom: 'clamp(20px, 4vh, 32px)' }}>
+          <svg viewBox="0 0 150 100" width="100%" height="100%" fill="none">
+            <rect x="4" y="8" width="142" height="84" rx="14" stroke={W} strokeWidth="1" opacity="0.8" />
+            <rect x="16" y="16" width="118" height="68" rx="4" fill="rgba(245,239,228,0.012)" />
+            <rect x="16" y="16" width="118" height="68" rx="4" stroke={W} strokeWidth="0.25" opacity="0.1" />
+            <rect x="65" y="11" width="20" height="3" rx="1.5" stroke={W} strokeWidth="0.6" opacity="0.3" />
+            <rect x="60" y="86" width="30" height="3" rx="1.5" stroke={W} strokeWidth="0.5" opacity="0.2" />
+            <line x1="24" y1="24" x2="126" y2="24" stroke={W} strokeWidth="0.3" opacity="0.08" />
+            <line x1="24" y1="34" x2="110" y2="34" stroke={W} strokeWidth="0.3" opacity="0.08" />
+            <line x1="24" y1="44" x2="126" y2="44" stroke={W} strokeWidth="0.3" opacity="0.08" />
+            <line x1="24" y1="54" x2="105" y2="54" stroke={W} strokeWidth="0.3" opacity="0.08" />
+            <line x1="24" y1="64" x2="118" y2="64" stroke={W} strokeWidth="0.3" opacity="0.08" />
           </svg>
 
           <div style={{
-            position: 'absolute', top: '36%', left: '50%',
-            transform: 'translateX(-50%)',
-            animation: 'm-hand-tap 4s ease-in-out infinite',
-          }}>
-            <svg viewBox="0 0 24 34" width="20" height="28" fill="none">
-              <path d="M12 2 C8 3 5 7 5 12 C4 17 5 22 8 26 C10 28 11.5 29 13 29 C14.5 29 16 28 18 26 C21 22 22 17 22 12 C22 7 19 3 15 2 C14 1.5 14 2 12 2Z"
-                fill={W} opacity="0.85" />
-              <path d="M19.5 17 Q18.5 22 16.5 25" stroke={Y} strokeWidth="0.4" fill="none" opacity="0.35" />
-            </svg>
-          </div>
-
-          <div style={{ ...RING, width: 14, height: 14, animation: 'm-tap-ring 4s ease-out infinite' }} />
-          <div style={{ ...RING, width: 20, height: 20, animation: 'm-tap-ring 4s ease-out 0.12s infinite' }} />
-          <div style={{ ...RING, width: 28, height: 28, animation: 'm-tap-ring 4s ease-out 0.24s infinite' }} />
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 3, height: 3,
+            borderRadius: '50%',
+            background: Y,
+            opacity: 0,
+            animation: 'm-real-ripple 3.5s ease-out infinite',
+          }} />
         </div>
         <p style={s.main}>Tap to Continue</p>
         <p style={s.sub}>Enter fullscreen mode for best experience</p>
