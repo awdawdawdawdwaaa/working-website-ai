@@ -8,8 +8,8 @@
 # Stage all changes in the repo
 git add .
 
-# Commit with a generic message (change "update" if desired)
+
 git commit -m "update"
 
-# Push to the remote repository on the current branch
+
 git push

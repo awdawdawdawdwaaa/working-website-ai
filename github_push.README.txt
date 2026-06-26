@@ -50,7 +50,8 @@ updatehoto - cd "F:\saved website 2\saved 1"
 git status
 
 git add .
- 09
+
+ git commit -m "update"
+git push
 git add .
->> git commit -m "update"
->> git push
+git commit -m "mobile update 0.4-c"
